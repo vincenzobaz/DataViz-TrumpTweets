@@ -1,7 +1,6 @@
 import nltk
 from nltk.stem import WordNetLemmatizer
 import json
-import scipy
 from scipy.sparse import csr_matrix
 from scipy.sparse.linalg import svds
 import math
@@ -44,10 +43,10 @@ def compute_tfidf_matrix(term_document_mat):
     """
     Computes tfidf matrix: each element is tf(term, doc) * idf(term)
     """
-    rows, cols, _ = scipy.sparse.find(term_document_mat)
+    rows, cols = term_document_mat.nonzero()
     tf = lambda t, d: compute_term_frequency(t, d, term_document_mat)
     idf = lambda t: compute_inverse_document_frequency(t, term_document_mat)
-    vals = [tf(t, d,) * idf(t) for t, d in zip(rows, cols)]
+    vals = [tf(t, d) * idf(t) for t, d in zip(rows, cols)]
     return csr_matrix((vals, (rows, cols)), shape=term_document_mat.shape)
 
 
@@ -104,4 +103,5 @@ if __name__ == '__main__':
     terms = get_all_terms(tweets)
     td = create_term_document_matrix(terms, tweets)
     tfidf = compute_tfidf_matrix(td)
+    print(tfidf)
 
