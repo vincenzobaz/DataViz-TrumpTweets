@@ -1,9 +1,14 @@
+import json
+import math
+from itertools import chain
+
 import nltk
 from nltk.stem import WordNetLemmatizer
-import json
+
 from scipy.sparse import csr_matrix
 from scipy.sparse.linalg import svds
-import math
+
+from sklearn.decomposition import NMF, LatentDirichletAllocation
 
 
 def create_term_document_matrix(terms, documents):
@@ -54,12 +59,12 @@ def get_all_terms(cleaned_tweets):
     """
     Extracts terms from tweets
     """
-    all_terms = []
-    for tweet in cleaned_tweets:
-        for term in tweet.split(' '):
-            if len(term) > 0 and term not in all_terms:
-                all_terms.append(term)
-    return all_terms
+    splitter = lambda t: t.split(' ')
+    non_empty = lambda w: len(w) > 0
+    # Create iterator over all words
+    all_terms_iter = chain.from_iterable(filter(non_empty, map(splitter, cleaned_tweets)))
+    # Delete duplicates and revert to list
+    return list(set(all_terms_iter))
 
 
 class Cleaner:
@@ -103,5 +108,15 @@ if __name__ == '__main__':
     terms = get_all_terms(tweets)
     td = create_term_document_matrix(terms, tweets)
     tfidf = compute_tfidf_matrix(td)
-    print(tfidf)
+
+    no_top_words = 5
+    print("Using nmf")
+    nmf = NMF(alpha=.1, l1_ratio=.5, init='nndsvd').fit(tfidf)
+    for tid, t in enumerate(nmf.components_):
+        print(' '.join([terms[i] for i in t.argsort()[:-no_top_words - 1 : -1]]))
+
+    print("Using lda")
+    lda = LatentDirichletAllocation(max_iter=5, learning_method='online', learning_offset=50.,random_state=0).fit(td)
+    for tid, t in enumerate(nmf.components_):
+        print(' '.join([terms[i] for i in t.argsort()[:-no_top_words - 1 : -1]]))
 
