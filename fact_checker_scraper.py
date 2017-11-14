@@ -39,9 +39,9 @@ def most_similar(ls, orig):
     closest_idx = -1
     closest_dst = -1
     for idx, bag in enumerate(ls):
-        dist = len(list(filter(lambda word: word in orig, bag)))
-        if dist > closest_dst:
-            closest_dst = dist
+        score = len(list(filter(lambda word: word in orig, bag)))
+        if score > closest_dst:
+            closest_dst = score
             closest_idx = idx
     return closest_idx
 
@@ -53,7 +53,7 @@ if __name__ == '__main__':
     claims_list = soup.find(id='claims-list')\
                       .findAll('div', class_='claim-row')
 
-    claims = list(map(parse_claim, claims_list))
+    claims = map(parse_claim, claims_list)
 
     # Build a hash map indexed on (day,month) with collision lists
     claims = to_hash_collisions(claims, 'date')
@@ -70,8 +70,12 @@ if __name__ == '__main__':
     # Build a hash map indexed on (day,month) with collision lists
     tweets17 = to_hash_collisions(tweets17, 'created_at')
 
+
     # Associate tweet id to each debunked tweet
-    for date, debunked_list in filter(lambda tu: tu[0] in tweets17, claims.items()):
+    for date, debunked_list in claims.items():
+        if date not in tweets17:
+            print('No tweet for', date)
+            continue
         collision_list = tweets17[date]
         for deb in debunked_list:
             corresponding = None
@@ -84,8 +88,11 @@ if __name__ == '__main__':
 
     # Convert hashmap with collision lists back to list and sort by date
     claims = sorted(chain.from_iterable(claims.values()), key=lambda o: o['date'])
+    claims = list(filter(lambda t: 'tweet_id' in t, claims))
 
     # Dump everything to a nice json
     with open('fact_checked.json', 'w') as f:
         json.dump(claims, f)
+
+    print(len(claims), 'debunked tweets',  len(set([o['tweet_id'] for o in claims])), 'unique id associated to them :(')
 
