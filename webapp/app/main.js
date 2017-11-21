@@ -2,10 +2,10 @@
 import * as d3 from 'd3';
 
 // Local imports
-import { createCircleChart } from './circle';  // named import
-import makeBarChart from './bar';  // name is irrelevant since it is a default export
+import { createCircleChart } from './circle';
+import makeBarChart from './bar'; // name is irrelevant since it is a default export
 
-require('./main.scss');  // will build CSS from SASS 3 file
+require('./main.scss'); // will build CSS from SASS 3 file
 
 // eslint-disable-next-line no-unused-vars
 function buildCircleChart(chartWidth, chartHeight) {
@@ -23,7 +23,7 @@ function buildCircleChart(chartWidth, chartHeight) {
 }
 
 // Main
-const vizDiv = document.getElementById("viz");
+const vizDiv = document.getElementById('viz');
 
 const chartWidth = vizDiv.clientWidth;
 const chartHeight = vizDiv.clientHeight;
