@@ -6,14 +6,15 @@
   "scripts": {
     "lint": "eslint 'app/**/*.@(js|jsx)'",
     "build": "webpack",
-    "start": "webpack-dev-server --devtool eval --progress --hot --content-base app",
+    "start": "webpack-dev-server --content-base app",
     "deploy": "NODE_ENV=production webpack --config webpack.production.config.js"
   },
   "dependencies": {
     "babel-runtime": "latest",
     "c3": "^0.4.18",
     "d3": "latest",
-    "lodash": "latest"
+    "lodash": "latest",
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
     "babel-core": "latest",

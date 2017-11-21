@@ -6,9 +6,9 @@ var ExtractTextPlugin = require("extract-text-webpack-plugin");
 module.exports = {
   devServer: {
     historyApiFallback: true,
-    hot: true,
-    inline: true,
-    progress: true,
+    // hot: true,
+    // inline: true,
+    // progress: true,
     contentBase: './app',
     port: 8080
   },
@@ -41,7 +41,7 @@ module.exports = {
   },
   plugins: [
     new ExtractTextPlugin({filename: 'main.css'}),
-    new webpack.HotModuleReplacementPlugin(),
+    //new webpack.HotModuleReplacementPlugin(),
     new OpenBrowserPlugin({ url: 'http://localhost:8080' }),
     new webpack.LoaderOptionsPlugin({
       options: {
