@@ -22,5 +22,5 @@ fetch(server_url + 'topics.json')
   .then(el => el.json())
   .then(data => {
     const bubbles = data.map(tuple => ({text: tuple[0], size: tuple[1].length, callback: () => console.log('Clicked on ' + tuple[0])}));
-    const bubblePlot = new Bubbles(svg, bubbles);
+    const bubblePlot = new Bubbles(svg, bubbles, [1280, 720]);
   })
