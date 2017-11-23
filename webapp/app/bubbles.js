@@ -1,16 +1,16 @@
 import * as d3 from 'd3';
 import * as _ from 'lodash';
 
-export class Bubbles {
+class Bubbles {
     constructor(anchor, bubbles, dimensions, animTime = 1000) {
         this.anchor = anchor;
         const layout = d3.pack()
-            .size(dimensions)
-            .padding(1.5);
+                         .size(dimensions)
+                         .padding(5);
 
         const root = d3.hierarchy({ children: bubbles })
-            .sum(bubble => bubble.size)
-            .sort((a, b) => b.size - a.size);
+                       .sum(bubble => bubble.size)
+                       .sort((a, b) => b.size - a.size);
 
         layout(root);
         this.bubbles = root.children;
@@ -21,22 +21,22 @@ export class Bubbles {
         const color = d3.scaleOrdinal(d3.schemeCategory10);
 
         const bubbleGroup = this.anchor.append('g')
-            .classed('bubbles', true);
+                                       .classed('bubbles', true);
         const start = bubbleGroup.selectAll('g')
-            .data(this.bubbles)
-            .enter()
-            .append('g')
-            .attr('transform', layout_bubble => `translate(${layout_bubble.x}, ${layout_bubble.y})`);
+                                 .data(this.bubbles)
+                                 .enter()
+                                 .append('g')
+                                 .attr('transform', layout_bubble => `translate(${layout_bubble.x}, ${layout_bubble.y})`);
 
         start.append('circle')
-            .attr('fill', b => color(b.data.size))
-            .attr('r', b => b.r)
-            .on('click', this.callback.bind(this));
+             .attr('fill', b => color(b.data.size))
+             .attr('r', b => b.r)
+             .on('click', this.callback.bind(this));
 
         start.append('text')
-            .attr('text-anchor', 'middle')
-            .attr('alignment-baseline', 'middle')
-            .text(b => b.data.text);
+             .attr('text-anchor', 'middle')
+             .attr('alignment-baseline', 'middle')
+             .text(b => _.capitalize(b.data.text.replace('_', ' ')));
     }
 
     callback(layout_bubble) {
@@ -59,12 +59,14 @@ export class Bubbles {
             .selectAll('g')
             .transition()
             .attr('transform', layout_bubble => `translate(${layout_bubble.x}, ${layout_bubble.y})`)
+            .selectAll('circle')
+            .attr('r', b => b.r)
             .duration(this.animTime);
         return this;
     }
 
     flattenBubbles() {
-        const padding = 2;
+        const padding = 10;
         const padCount = this.bubbles.length - 1;
         const totLength = this.bubbles.reduce((acc, n) => acc + n.data.size, 0); + padding * padCount;
         const scale = len => (this.dimensions[0] * len) / totLength;
@@ -85,15 +87,20 @@ export class Bubbles {
         };
 
         this.anchor.select('.bubbles')
-            .selectAll('g')
-            .transition()
-            .attr('transform', (n, i) => translate(n, i))
-            .selectAll('circle')
-            .attr('r', n => {
-                const [start, end] = nameToPos[n.data.text];
-                return (end - start) / 2
-            })
-            .duration(this.animTime);
+                   .selectAll('g')
+                   .transition()
+                   .attr('transform', (n, i) => translate(n, i))
+                   .selectAll('circle')
+                   .attr('r', n => {
+                       const [start, end] = nameToPos[n.data.text];
+                       return (end - start) / 2
+                   })
+                   .duration(this.animTime);
         return this;
     }
 }   
+
+export function generateBubblePlot(anchor, bubbles, dimensions, animTime = 1000) {
+    const bubble = new Bubbles(anchor, bubbles, dimensions, animTime = 1000);
+    return anchor.select('.bubbles')
+}
