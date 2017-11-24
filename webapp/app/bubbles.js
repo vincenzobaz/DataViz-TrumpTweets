@@ -35,7 +35,7 @@ export class Bubbles {
         } else { // otherwise select new bubble and redraw
             this.selectedBubble = layout_bubble.data.text;
             this.drawCollapsed();
-            layout_bubble.data.callback();
+            if (_.has(layout_bubble.data, 'callback')) layout_bubble.data.callback();
         }
     }
 
