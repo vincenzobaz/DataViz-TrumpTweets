@@ -1,23 +1,20 @@
-import * as _ from 'lodash';
-import * as d3 from 'd3';
-import * as c3 from 'c3';
-
-import { generateBubblePlot } from './bubbles';
+import { dashboard } from './dashboard';
 
 const server_url = 'http://localhost:8000/';
 
 require('./main.scss'); // will build CSS from SASS 3 file
 
-const vizDiv = document.getElementById('viz');
-const chartWidth = vizDiv.clientWidth;
-const chartHeight = vizDiv.clientHeight;
-
+fetch(server_url + 'topics.json')
+  .then(el => el.json())
+  .then(dashboard);
+/*
 const bigSVG = d3.select('#viz')
                  .append('svg')
                  .attr('id', 'global-container')
                  .attr('preserveAspectRatio', 'xMinYMin meet')
                  .attr('viewBox', `0 0 ${chartWidth} ${chartHeight}`)
                  .classed('svg-content-responsive', true)
+                 */
 
 function splitWords(text) {
   return text.split(' ');
@@ -31,6 +28,7 @@ function focusOnTopic(topicName, tweets, anchor) {
 
   anchor.append('svg')
         .attr('id', 'hists')
+        .attr('transform', `translate(500, 700)`)
   c3.generate({
     bindto: '#hists',
     data: {
@@ -63,6 +61,3 @@ function topicsViz(topics) {
 }
 
 // Create topic bubble chart
-fetch(server_url + 'topics.json')
-  .then(el => el.json())
-  .then(topicsViz);

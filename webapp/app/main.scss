@@ -40,3 +40,31 @@ body {
   top: 0px;
   bottom: 0px;
 }
+
+$sidebar-with: 10%;
+
+#sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: $sidebar-with;
+  background: white;
+}
+
+#content-pane {
+  position: fixed;
+  left: $sidebar-with;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  background-color: green;
+}
+
+.stats {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  background-color: violet;
+}
