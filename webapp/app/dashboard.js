@@ -12,14 +12,15 @@ const contentHeight = document.getElementById('content-pane').clientHeight;
 
 export class Dashboard {
     constructor(data) {
+        const byTopics = _.groupBy(_.filter(data, tweet => tweet['topic'] != null), tweet => tweet['topic']);
         const panes = [{
             text: 'Topics',
             color: ' #FFC300',
-            onClick: () => this.displayTopics(data)
+            onClick: () => this.displayTopics(byTopics)
         }, {
             text: 'Sentiments',
             color: '#FF5733',
-            onClick: () => console.log('SENTIMENTS')
+            onClick: () => this.displaySentiments(data)
         }];
         this.displayed = null;
         const sidebar = new Sidebar('#sidebar', panes, [sidebarWidth, sidebarHeight]);
@@ -29,21 +30,28 @@ export class Dashboard {
         // already displayed => do nothing, otherwise draw.
         if (this.displayed == 'topics') return;
         this.displayed = 'topics'
-        const bubbles = topicData.map(tuple => ({
+        d3.select('#content-pane').select('#svg-bubbles').remove()
+        const bubbles = _.toPairs(topicData).map(tuple => ({
             text: tuple[0],
             size: tuple[1].length,
-            callback: () => { }//focusOnTopic(tuple[0], tuple[1], topicBubbleSVG)
         }));
         const bubblePlot = new Bubbles('#content-pane', bubbles, [contentWidth, contentHeight], [contentWidth / 10, contentHeight]);
         bubblePlot.drawFull()
-        d3.select('#content-pane')
-          .append('div')
-          .html('lol')
     }
 
-    displaySentiments(sentimentData) {
+    displaySentiments(tweets) {
         if (this.displayed == 'sentiments') return;
         this.displayed = 'sentiments';
+        d3.select('#content-pane').select('#svg-bubbles').remove()
+        const emotionToScore = _.filter(_.flatMap(tweets, tweet => _.toPairs(tweet['emotions'])), tup => tup[0] != 'positive' && tup[0] != 'negative');
+        const scores = {}
+        for (let tuple of emotionToScore) {
+            const [emotion, value] = tuple;
+            scores[emotion] = _.get(scores, emotion, 0) + value;
+        }
+        const bubbles = _.map(_.toPairs(scores), pair => ({text: pair[0], size: pair[1]}));
+        const bubblePlot = new Bubbles('#content-pane', bubbles, [contentWidth, contentHeight], [contentWidth / 10, contentHeight]);
+        bubblePlot.drawFull()
     }
 }
 
