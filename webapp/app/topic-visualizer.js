@@ -7,7 +7,6 @@ export class TopicVisualizer extends Visualizer {
 
     constructor(selector, tweets) {
         super(selector);
-        this.tweets = tweets;
 
         const emotionCounts = {};
         const emotions = _.map(_.filter(tweets, t => _.has(t, 'emotions')), 'emotions');
@@ -16,6 +15,11 @@ export class TopicVisualizer extends Visualizer {
                 emotionCounts[emotion] = _.get(emotionCounts, emotion, 0) + tweetEmotions[emotion];
             }
         }
-        // TODO: build time series
+
+        this.timeSeriesData = stats.createTimeSeries(tweets);
+        this.linkData = emotionCounts;
+        this.likes = stats.getLikeCount(tweets);
+        this.retweets = stats.getRetweetCount(tweets);
+        this.wordData = stats.getWordUsage(tweets);
     }
 }

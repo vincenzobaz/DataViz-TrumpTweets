@@ -15,5 +15,10 @@ export class SentimentVisualizer extends Visualizer {
             }
         });
 
+        this.timeSeriesData = stats.createTimeSeries(presentTweets, t => t.emotions[sentiment])
+        this.linkData = topicToValue;
+        this.likes = stats.getLikeCount(predominantTweets);
+        this.retweets = stats.getRetweetCount(predominantTweets);
+        this.wordData = stats.getWordUsage(predominantTweets);
     }
 }
