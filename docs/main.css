@@ -1,0 +1,64 @@
+@import 'colors';
+
+html,
+body {
+    padding: 0;
+    margin: 0;
+}
+
+.bars {
+  fill: $color-primary-2;
+  opacity: 0.8;
+}
+
+.svg-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%; /* aspect ratio */
+    vertical-align: top;
+    overflow: hidden;
+}
+.svg-content-responsive {
+    display: inline-block;
+    position: absolute;
+    top: 10px;
+    left: 0;
+}
+
+.axis line,
+.axis path {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+$sidebar-with: 10%;
+
+#sidebar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: $sidebar-with;
+  background: white;
+}
+
+#content-pane {
+  position: absolute;
+  left: $sidebar-with;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  background-color: green;
+}
+
+.stats {
+  position: absolute;
+  //left: 12.5%;
+  width: 85%;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  background-color: violet;
+}
