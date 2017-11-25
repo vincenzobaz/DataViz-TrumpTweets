@@ -3,55 +3,42 @@ import * as d3 from 'd3';
 
 import { Sidebar } from './sidebar';
 import { Bubbles } from './bubbles';
+import { TopicsManager } from './topics-manager';
+import { SentimentsManager } from './sentiments-manager';
 
 const sidebarWidth = document.getElementById('sidebar').clientWidth;
 const sidebarHeight = document.getElementById('sidebar').clientHeight;
 
-const contentWidth = document.getElementById('content-pane').clientWidth;
-const contentHeight = document.getElementById('content-pane').clientHeight;
+class Dashboard {
+    constructor(tweets) {
+        this.tweets = _.filter(tweets, t => !t['is_retweet']);
+        this.displayed = null;
+        this.topicsManager = new TopicsManager('#content-pane', tweets);
+        this.sentimentsManager = new SentimentsManager('#content-pane', tweets);
 
-export class Dashboard {
-    constructor(data) {
-        const byTopics = _.groupBy(_.filter(data, tweet => tweet['topic'] != null), tweet => tweet['topic']);
         const panes = [{
             text: 'Topics',
             color: ' #FFC300',
-            onClick: () => this.displayTopics(byTopics)
+            onClick: () => this.display('topics')
         }, {
             text: 'Sentiments',
             color: '#FF5733',
-            onClick: () => this.displaySentiments(data)
+            onClick: () => this.display('sentiments')
         }];
-        this.displayed = null;
         const sidebar = new Sidebar('#sidebar', panes, [sidebarWidth, sidebarHeight]);
     }
 
-    displayTopics(topicData) {
-        // already displayed => do nothing, otherwise draw.
-        if (this.displayed == 'topics') return;
-        this.displayed = 'topics'
-        d3.select('#content-pane').select('#svg-bubbles').remove()
-        const bubbles = _.toPairs(topicData).map(tuple => ({
-            text: tuple[0],
-            size: tuple[1].length,
-        }));
-        const bubblePlot = new Bubbles('#content-pane', bubbles, [contentWidth, contentHeight], [contentWidth / 10, contentHeight]);
-        bubblePlot.drawFull()
-    }
-
-    displaySentiments(tweets) {
-        if (this.displayed == 'sentiments') return;
-        this.displayed = 'sentiments';
-        d3.select('#content-pane').select('#svg-bubbles').remove()
-        const emotionToScore = _.filter(_.flatMap(tweets, tweet => _.toPairs(tweet['emotions'])), tup => tup[0] != 'positive' && tup[0] != 'negative');
-        const scores = {}
-        for (let tuple of emotionToScore) {
-            const [emotion, value] = tuple;
-            scores[emotion] = _.get(scores, emotion, 0) + value;
+    display(what) {
+        if (what != this.displayed) {
+            this.displayed = what;
+            if (what == 'topics') {
+                this.sentimentsManager.hide();
+                this.topicsManager.draw();
+            } else if (what == 'sentiments') {
+                this.topicsManager.hide();
+                this.sentimentsManager.draw();
+            }
         }
-        const bubbles = _.map(_.toPairs(scores), pair => ({text: pair[0], size: pair[1]}));
-        const bubblePlot = new Bubbles('#content-pane', bubbles, [contentWidth, contentHeight], [contentWidth / 10, contentHeight]);
-        bubblePlot.drawFull()
     }
 }
 

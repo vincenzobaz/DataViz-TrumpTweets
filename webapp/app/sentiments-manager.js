@@ -12,8 +12,17 @@ const flattenedBubblesWidth = contentWidth / 10;
 export class SentimentsManager extends Manager {
     constructor(selector, tweets) {
         super(selector, 'sentiments-content');
-        this.tweets = tweets;
+        this.tweets = _.filter(tweets, t => _.has(t, 'emotions'));
         this.bubbles = this.createBubbles();
+    }
+
+    tweetsDominatedBy(sentiment) {
+        return this.tweets.filter(tweet => {
+            return _.get(tweet.emotions, sentiment, 0) >= _.max(_.toArray(tweet.emotions))});
+    }
+
+    tweetsWith(sentiment) {
+        return this.tweets.filter(t => _.has(t.emotions, sentiment));
     }
 
     createBubbles() {
@@ -32,7 +41,11 @@ export class SentimentsManager extends Manager {
     }
 
     getVisualizer(sentiment) {
-        return new SentimentVisualizer('sentiments-content', []);
+        return new SentimentVisualizer('sentiments-content',
+            sentiment,
+            this.tweetsDominatedBy(sentiment),
+            this.tweetsWith(sentiment)
+        );
     }
 
 }
