@@ -62,3 +62,19 @@ $sidebar-with: 10%;
   top: 0;
   background-color: violet;
 }
+
+#timeseries {
+  background-color: blue;
+  height: 25%;
+}
+
+#word-usage {
+  background-color: red;
+  height: 25%;
+}
+
+#link-bar {
+  background-color: brown;
+  height: 25%;
+}
+
