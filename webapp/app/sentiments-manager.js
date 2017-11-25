@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 
 import { Bubbles } from './bubbles';
 import { Manager } from './manager';
+import { SentimentVisualizer } from './sentiment-visualizer';
 
 const contentWidth = document.getElementById('content-pane').clientWidth;
 const contentHeight = document.getElementById('content-pane').clientHeight;
@@ -23,7 +24,15 @@ export class SentimentsManager extends Manager {
             const [emotion, value] = tuple;
             scores[emotion] = _.get(scores, emotion, 0) + value;
         }
-        return _.map(_.toPairs(scores), pair => ({ text: pair[0], size: pair[1] }));
+        return _.map(_.toPairs(scores), pair => ({
+            text: pair[0],
+            size: pair[1],
+            callback: () => this.focusOn(pair[0])
+        }));
+    }
+
+    getVisualizer(sentiment) {
+        return new SentimentVisualizer('sentiments-content', []);
     }
 
 }

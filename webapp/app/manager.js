@@ -36,4 +36,17 @@ export class Manager {
         this.divExists = false;
     }
 
+    focusOn(newFocus) {
+        // Nothing is selected, create viz
+        if (this.focusedOn == newFocus) {
+            this.visualizer.hide();
+            this.focusedOn = null;
+        } else {
+            if (this.focusedOn) this.visualizer.hide();
+            this.visualizer = this.getVisualizer(newFocus);
+            this.visualizer.draw();
+            this.focusedOn = newFocus;
+        }
+    }
+
 }
