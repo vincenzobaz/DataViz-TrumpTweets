@@ -23,10 +23,8 @@ export class Visualizer {
             .select('.stats')
             .append('div')
             .attr('id', 'timeseries')
-/*             .attr('width', '100%')
-            .attr('height', '25%')
 
- */        bb.generate({
+        bb.generate({
             data: {
                 x: "x",
                 columns: [
@@ -55,10 +53,7 @@ export class Visualizer {
             .select('.stats')
             .append('div')
             .attr('id', 'word-usage')
-/*             .attr('width', '40%')
-            .attr('height', '25%')
-
- */        const [words, counts] = _.unzip(this.wordData.slice(0, 50));
+        const [words, counts] = _.unzip(this.wordData.slice(0, 30));
 
         bb.generate({
             data: {
@@ -88,14 +83,13 @@ export class Visualizer {
             .select('.stats')
             .append('div')
             .attr('id', 'link-bar')
-/*             .attr('width', '40%')
-            .attr('height', '25%')
 
- */        const [linkLabels, linkValues] = _.unzip(this.linkData);
+        const [linkLabels, linkValues] = this.linkData;
+        console.log(linkLabels)
         bb.generate({
             data: {
                 columns: [
-                    ['Link', ...linkValues]
+                    linkValues
                 ],
                 type: "bar"
             },

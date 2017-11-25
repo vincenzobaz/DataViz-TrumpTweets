@@ -17,7 +17,9 @@ export class SentimentVisualizer extends Visualizer {
 
         let [labels, values] = stats.createTimeSeries(presentTweets, t => t.emotions[sentiment]);
         this.timeSeriesData = [labels, [`Number of tweets containing emotion ${sentiment}`, ...values]];
-        this.linkData = _.sortBy(_.toPairs(topicToValue), p => -p[1]);
+
+        [labels, values] = _.unzip(_.sortBy(_.toPairs(topicToValue), p => -p[1]));
+        this.linkData = [labels, [`Number of tweets containing emotion ${sentiment} per topic`, ...values]]
         this.likes = stats.getLikeCount(predominantTweets);
         this.retweets = stats.getRetweetCount(predominantTweets);
         this.wordData = stats.getWordUsage(predominantTweets);
