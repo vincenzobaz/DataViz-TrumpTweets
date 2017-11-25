@@ -41,6 +41,9 @@ module.exports = {
   },
   plugins: [
     new ExtractTextPlugin({filename: 'main.css'}),
+    new webpack.DefinePlugin({
+      'dataUrl': JSON.stringify('http://localhost:8000/data.json')
+    }),
     //new webpack.HotModuleReplacementPlugin(),
     new OpenBrowserPlugin({ url: 'http://localhost:8080' }),
     new webpack.LoaderOptionsPlugin({
