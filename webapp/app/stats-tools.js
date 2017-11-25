@@ -24,7 +24,7 @@ export function getWordUsage(tweets, getCoefficient = t => 1) {
         res[word] = _.get(res, word, 0) + coef;
     }
 
-    return res;
+    return _.sortBy(_.toPairs(res), p => -p[1]);
 }
 
 export function createTimeSeries(tweets, getCoefficient = t => 1) {
@@ -44,8 +44,8 @@ export function createTimeSeries(tweets, getCoefficient = t => 1) {
     const cleanStrings = _.map(_.toPairs(yearMonthSum), yearMonthVal => {
         const [yearMonth, val] = yearMonthVal;
         const [year, month] = yearMonth.split(' ');
-        const d = Date(year, month, 1, 0, 0, 0, 0);
-        return [d, val];
+        const d = new Date(year, month, 1, 0, 0, 0, 0);
+        return [d/* .toDateString() */, val];
     });
     return _.unzip(cleanStrings);
 }

@@ -16,8 +16,10 @@ export class TopicVisualizer extends Visualizer {
             }
         }
 
-        this.timeSeriesData = stats.createTimeSeries(tweets);
-        this.linkData = emotionCounts;
+        const topic = tweets[0].topic.replace('_', ' ');
+        const [dates, values] = stats.createTimeSeries(tweets);
+        this.timeSeriesData = [dates, [`Number of tweets containing topic ${topic}`, ...values]];
+        this.linkData = _.sortBy(_.toPairs(emotionCounts), p => -p[1]);
         this.likes = stats.getLikeCount(tweets);
         this.retweets = stats.getRetweetCount(tweets);
         this.wordData = stats.getWordUsage(tweets);

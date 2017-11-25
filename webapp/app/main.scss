@@ -55,9 +55,26 @@ $sidebar-with: 10%;
 
 .stats {
   position: absolute;
-  left: 12.5%;
+  //left: 12.5%;
+  width: 85%;
   right: 0;
   bottom: 0;
   top: 0;
   background-color: violet;
 }
+
+#timeseries {
+  background-color: blue;
+  height: 25%;
+}
+
+#word-usage {
+  background-color: red;
+  height: 25%;
+}
+
+#link-bar {
+  background-color: brown;
+  height: 25%;
+}
+
