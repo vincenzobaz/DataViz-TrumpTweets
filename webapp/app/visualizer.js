@@ -85,7 +85,6 @@ export class Visualizer {
             .attr('id', 'link-bar')
 
         const [linkLabels, linkValues] = this.linkData;
-        console.log(linkLabels)
         bb.generate({
             data: {
                 columns: [
@@ -110,7 +109,19 @@ export class Visualizer {
             bindto: "#link-bar"
         });
 
-
+        /* TODO: Implement bubbles, see bubbles.js for an idea
+        const bubbleData = [['Retweets', this.retweets], ['Stars', this.likes]];
+        const startSelector = d3.select('#' + this.selector)
+            .select('.stats')
+            .append('div')
+            .id('stats-bubbles')
+            .append('svg')
+            .selectAll('g')
+            .data(bubbleData)
+            .enter()
+            .append('g')
+            .attr('transform', )
+        */
     }
 
     hide() {
