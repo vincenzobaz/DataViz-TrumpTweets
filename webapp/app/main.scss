@@ -33,18 +33,10 @@ body {
   shape-rendering: crispEdges;
 }
 
-#viz {
-  position: fixed;
-  left: 0px;
-  right: 0px;
-  top: 0px;
-  bottom: 0px;
-}
-
 $sidebar-with: 10%;
 
 #sidebar {
-  position: fixed;
+  position: absolute;
   left: 0;
   top: 0;
   bottom: 0;
@@ -53,7 +45,7 @@ $sidebar-with: 10%;
 }
 
 #content-pane {
-  position: fixed;
+  position: absolute;
   left: $sidebar-with;
   right: 0;
   bottom: 0;
@@ -62,7 +54,8 @@ $sidebar-with: 10%;
 }
 
 .stats {
-  position: fixed;
+  position: absolute;
+  left: 12.5%;
   right: 0;
   bottom: 0;
   top: 0;
