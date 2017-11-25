@@ -4,6 +4,8 @@ var uglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
+const server_url = 'https://vincenzobaz.github.io/DataViz-TrumpTweets/';
+
 module.exports = {
   entry: [
     path.resolve(__dirname, 'app/main.js'),
@@ -41,6 +43,7 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       'process.env': {
+        'server_url': JSON.stringify(server_url),
         NODE_ENV: JSON.stringify('production')
       }
     }),

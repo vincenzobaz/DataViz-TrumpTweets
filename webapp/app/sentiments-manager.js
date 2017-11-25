@@ -5,10 +5,6 @@ import { Bubbles } from './bubbles';
 import { Manager } from './manager';
 import { SentimentVisualizer } from './sentiment-visualizer';
 
-const contentWidth = document.getElementById('content-pane').clientWidth;
-const contentHeight = document.getElementById('content-pane').clientHeight;
-const flattenedBubblesWidth = contentWidth / 10;
-
 export class SentimentsManager extends Manager {
     constructor(selector, tweets) {
         super(selector, 'sentiments-content');

@@ -1,9 +1,6 @@
 import * as d3 from 'd3';
 import { Bubbles } from './bubbles';
 
-const contentWidth = document.getElementById('content-pane').clientWidth;
-const contentHeight = document.getElementById('content-pane').clientHeight;
-const flattenedBubblesWidth = contentWidth / 10;
 
 export class Manager {
     constructor(selector, id) {
@@ -19,6 +16,10 @@ export class Manager {
     }
 
     draw() {
+        const contentWidth = document.getElementById('content-pane').clientWidth;
+        const contentHeight = document.getElementById('content-pane').clientHeight;
+
+        const flattenedBubblesWidth = contentWidth / 10;
         if (!this.divExists) {
             d3.select(this.selector)
                 .append('div')

@@ -6,9 +6,6 @@ import { Bubbles } from './bubbles';
 import { TopicsManager } from './topics-manager';
 import { SentimentsManager } from './sentiments-manager';
 
-const sidebarWidth = document.getElementById('sidebar').clientWidth;
-const sidebarHeight = document.getElementById('sidebar').clientHeight;
-
 class Dashboard {
     constructor(tweets) {
         this.tweets = _.filter(tweets, t => !t['is_retweet']);
@@ -25,6 +22,9 @@ class Dashboard {
             color: '#FF5733',
             onClick: () => this.display('sentiments')
         }];
+        const sidebarWidth = document.getElementById('sidebar').clientWidth;
+        const sidebarHeight = document.getElementById('sidebar').clientHeight;
+
         const sidebar = new Sidebar('#sidebar', panes, [sidebarWidth, sidebarHeight]);
     }
 
