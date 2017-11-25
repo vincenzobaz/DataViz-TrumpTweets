@@ -18,7 +18,6 @@ export function getLikeCounts(tweets) {
 export function getWordUsage(tweets, getCoefficient = t => 1) {
     const wordToCoef = _.flatMap(tweets, tweet => _.map(breakText(tweet.text), w => [w, getCoefficient(tweet)]));
     const res = {};
-    console.log(wordToCoef.slice(0, 10));
 
     for (let tup of wordToCoef) {
         const [word, coef] = tup;
