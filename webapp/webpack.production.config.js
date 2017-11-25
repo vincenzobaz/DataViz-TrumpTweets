@@ -5,7 +5,6 @@ var CopyWebpackPlugin = require('copy-webpack-plugin');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 module.exports = {
-  devtool: 'cheap-source-map',
   entry: [
     path.resolve(__dirname, 'app/main.js'),
   ],
@@ -15,27 +14,26 @@ module.exports = {
     filename: './bundle.js'
   },
   module: {
-    loaders:[
-        { test: /\.jsx?$/,
-          include: path.resolve(__dirname, 'app'),
-          exclude: /node_modules/,
-          loader: 'babel-loader',
-          query: {
-            presets: ['es2015', 'stage-0', 'react']
-          }
-        },
-        { test: /\.css$/, include: path.resolve(__dirname, 'app'), loader: 'style-loader!css-loader' },
-        { test: /\.scss$/, loader: ExtractTextPlugin.extract('style', 'css?sourceMap!sass?sourceMap')},
-    ]
+    rules: [
+      {
+        test: /\.scss$/,
+        use: [{ loader: "style-loader" }, { loader: "css-loader" }, { loader: "sass-loader", options: { includePaths: ["app/style"] } }]
+      },
+      {
+        test: /\.css$/,
+        use: "css-loader"
+      },
+      {
+        test: /\.js$/,
+        loader: "babel-loader"
+      }
+
+    ],
   },
   resolve: {
-    extensions: ['', '.js', '.jsx'],
-  },
-  sassLoader: {
-    includePaths: [ 'app/style' ]
+    extensions: ['.js'],
   },
   plugins: [
-    new webpack.optimize.DedupePlugin(),
     new uglifyJsPlugin({
       compress: {
         warnings: false
