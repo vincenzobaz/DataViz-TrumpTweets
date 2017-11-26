@@ -1,9 +1,17 @@
 import * as _ from 'lodash';
 
-const punctuation = ['.', ',', '?', '!', '\'', '"', ':', ';', '...', '-', '@']
+const stopwords = ['.', ',', '?', '!', '\'', '"', ':', ';', '...', '-', '@',
+    'the', 'to', 'is', 'a', 'and', 'in', 'you', 'of', 'i', 'for', 'at', 'on',
+    'be', 'amp', 'your', 'my', 'it', 'will', 'our', 'us', 'we', 'cont', 'are',
+    'from', 'has', 'that', 'this', 'she', 'her', 'have', 'with', 'he',
+    'new', 'just', 'from', 'now', 'as', 'he', 'its', 'by', 'they', 'was',
+    'not', 'so', 'more', 'about', 'what', 'all', 'get', 'but', 'one',
+    'over', 'their', 'why', 'when', 'what', 'them', 'who', 'said', 'out',
+    'would', 'had', 'can', 'should', 'would', 'do', 'been', 'an', 'cont', 'dont',
+    '1','2','3','4','5','6','7','8','9'];
 
 function breakText(text) {
-    const noPunct = punctuation.reduce((acc, mark) => acc.replace(mark, ' '), _.lowerCase(text));
+    const noPunct = stopwords.reduce((acc, mark) => acc.replace(mark, ' '), _.lowerCase(text));
     return noPunct.split(' ');
 }
 
