@@ -8,7 +8,7 @@ const stopwords = ['.', ',', '?', '!', '\'', '"', ':', ';', '...', '-', '@',
     'not', 'so', 'more', 'about', 'what', 'all', 'get', 'but', 'one',
     'over', 'their', 'why', 'when', 'what', 'them', 'who', 'said', 'out',
     'would', 'had', 'can', 'should', 'would', 'do', 'been', 'an', 'cont', 'dont',
-    '1','2','3','4','5','6','7','8','9'];
+    '1','2','3','4','5','6','7','8','9', 'http', 'https', 'how', 'ing', 'gre'];
 
 function breakText(text) {
     const noPunct = stopwords.reduce((acc, mark) => acc.replace(mark, ' '), _.lowerCase(text));
