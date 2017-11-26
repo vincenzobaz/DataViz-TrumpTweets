@@ -87,8 +87,6 @@ $flattened-bubbles-width: 12%;
 }
 
 #intro {
-  top: 0;
-  background-color: yellow;
-  width: 100%;
-  height: 100%;
+  text-align: center;
+  position: static;
 }
