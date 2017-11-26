@@ -12,7 +12,6 @@ const stopwords = ['.', ',', '?', '!', '\'', '"', ':', ';', '...', '-', '@',
 
 function breakText(text) {
     const noPunct = stopwords.reduce((acc, mark) => acc.replace(mark, ' '), _.lowerCase(text));
-    console.log(noPunct);
     return _.filter(noPunct.split(' '), word => word.length > 2);
 }
 
