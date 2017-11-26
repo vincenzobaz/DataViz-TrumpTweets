@@ -18,8 +18,7 @@ export class Manager {
     draw() {
         const contentWidth = document.getElementById('content-pane').clientWidth;
         const contentHeight = document.getElementById('content-pane').clientHeight;
-
-        const flattenedBubblesWidth = contentWidth / 10;
+        const flattenedBubblesWidth = document.getElementById('flattened-bubbles').clientWidth;
         if (!this.divExists) {
             d3.select(this.selector)
                 .append('div')

@@ -77,9 +77,8 @@ export class Bubbles {
     drawCollapsed() {
         const padding = 10;
         const padCount = this.bubbles.length - 1;
-        const ratio = 5 / 3;
-        const normalSize = this.dimensionsCollapsed[1] / (this.bubbles.length - 1 + ratio);
-        const specialSize = normalSize * ratio;
+        const specialSize = this.dimensionsCollapsed[0];
+        const normalSize = (this.dimensionsCollapsed[1] - this.dimensionsCollapsed[0]) / (this.bubbles.length - 1);
         const newSizes = this.bubbles.map(b => b.data.text === this.selectedBubble ? specialSize : normalSize)
         for (let i = 1; i < newSizes.length; ++i) {
             newSizes[i] += newSizes[i - 1];
