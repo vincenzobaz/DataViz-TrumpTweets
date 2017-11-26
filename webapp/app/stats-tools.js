@@ -12,7 +12,8 @@ const stopwords = ['.', ',', '?', '!', '\'', '"', ':', ';', '...', '-', '@',
 
 function breakText(text) {
     const noPunct = stopwords.reduce((acc, mark) => acc.replace(mark, ' '), _.lowerCase(text));
-    return noPunct.split(' ');
+    console.log(noPunct);
+    return _.filter(noPunct.split(' '), word => word.length > 2);
 }
 
 export function getRetweetCount(tweets) {
