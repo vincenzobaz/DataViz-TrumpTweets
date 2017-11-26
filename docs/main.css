@@ -33,48 +33,60 @@ body {
   shape-rendering: crispEdges;
 }
 
-$sidebar-with: 10%;
+$sidebar-width: 10%;
+$flattened-bubbles-width: 12%;
 
-#sidebar {
+#container {
+  position: static;
+}
+
+#container #sidebar {
   position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: $sidebar-with;
+  width: $sidebar-width;
+  height: 100%;
   background: white;
 }
 
-#content-pane {
+#container #content-pane {
   position: absolute;
-  left: $sidebar-with;
-  right: 0;
-  bottom: 0;
-  top: 0;
+  left: $sidebar-width;
+  width: 100% - $sidebar-width;
+  height: 100%;
   background-color: green;
 }
 
-.stats {
+#container #content-pane #flattened-bubbles {
   position: absolute;
-  //left: 12.5%;
-  width: 85%;
+  left: $sidebar-width;
+  width: $flattened-bubbles-width;
+  height: 100%
+}
+
+#container #content-pane .stats {
+  position: absolute;
+  left: $flattened-bubbles-width;
   right: 0;
   bottom: 0;
   top: 0;
   background-color: violet;
 }
 
-#timeseries {
+#container #content-pane .stats #timeseries {
   background-color: lightpink;
   height: 35%;
 }
 
-#word-usage {
+#container #content-pane .stats #word-usage {
   background-color: lightgray;
   height: 25%;
 }
 
-#link-bar {
+#container #content-pane .stats #link-bar {
   background-color: lightseagreen;
   height: 25%;
 }
 
+#intro {
+  text-align: center;
+  position: static;
+}
