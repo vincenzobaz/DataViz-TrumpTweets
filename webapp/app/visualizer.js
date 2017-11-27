@@ -1,25 +1,33 @@
 import * as d3 from 'd3';
 import * as _ from 'lodash';
 import { bb } from 'billboard.js';
-
+let i = 0;
 export class Visualizer {
-    constructor(selector) {
-        this.selector = selector;
+    constructor(selector, animTime = 500) {
+        console.log(selector)
+        this.selector = '#' + selector;
+        this.animTime = animTime;
+        this.createDivs();
+        this.divExists = true;
+
+    }
+
+    createDivs() {
+        const bigBox = d3.select(this.selector)
+            .append('div')
+            .attr('class', 'stats')
+            .style('opacity', 0);
+
+        let divs = ['timeseries', 'word-usage', 'link-bar'].map(id => bigBox.append('div').attr('id', id))
+        divs = [bigBox, ...divs];
+        divs.forEach(div => div.transition().style('opacity', 1).delay(this.animTime).duration(this.animTime));
+        this.divExists = true;
     }
 
     draw() {
         if (!this.divExists) {
-            d3.select('#' + this.selector)
-                .append('div')
-                .attr('class', 'stats');
-            this.divExists = true;
+            this.createDivs();
         }
-
-        d3.select('#' + this.selector)
-            .select('.stats')
-            .append('div')
-            .attr('id', 'timeseries')
-
         bb.generate({
             data: {
                 x: "x",
@@ -45,10 +53,6 @@ export class Visualizer {
             bindto: "#timeseries"
         });
 
-        d3.select('#' + this.selector)
-            .select('.stats')
-            .append('div')
-            .attr('id', 'word-usage')
         const [words, counts] = _.unzip(this.wordData.slice(0, 30));
 
         bb.generate({
@@ -74,11 +78,6 @@ export class Visualizer {
             },
             bindto: "#word-usage"
         });
-
-        d3.select('#' + this.selector)
-            .select('.stats')
-            .append('div')
-            .attr('id', 'link-bar')
 
         const [linkLabels, linkValues] = this.linkData;
         bb.generate({
@@ -121,9 +120,14 @@ export class Visualizer {
     }
 
     hide() {
-        d3.select('#' + this.selector)
-            .select('.stats')
-            .remove();
-        this.divExists = false;
+        if (this.divExists) {
+            d3.select(this.selector)
+                .select('.stats')
+                //.transition()
+                //.style('opacity', 0) // Crashes :()
+                //.duration(0)
+                .remove();
+            this.divExists = false;
+        }
     }
 }

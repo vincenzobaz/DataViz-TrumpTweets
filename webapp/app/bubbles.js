@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import * as _ from 'lodash';
 
 export class Bubbles {
-    constructor(selector, bubbles, dimensionsFull, dimensionsCollapsed, animTime = 1000) {
+    constructor(selector, bubbles, dimensionsFull, dimensionsCollapsed, animTime = 500) {
         const layout = d3.pack()
             .size(dimensionsFull)
             .padding(5);
@@ -50,12 +50,12 @@ export class Bubbles {
                 .enter()
                 .append('g')
                 .attr('transform', layout_bubble => `translate(${layout_bubble.x}, ${layout_bubble.y})`)
+                .on('click', this.callback.bind(this));
 
             const color = d3.scaleOrdinal(d3.schemeCategory10);
             start.append('circle')
                 .attr('fill', b => color(b.data.size))
-                .attr('r', b => b.r)
-                .on('click', this.callback.bind(this));
+                .attr('r', b => b.r);
 
             start.append('text')
                 .attr('text-anchor', 'middle')
@@ -66,6 +66,7 @@ export class Bubbles {
             this.svg.select('.bubbles')
                 .selectAll('g')
                 .transition()
+                .delay(this.animTime)
                 .attr('transform', d => `translate(${d.x}, ${d.y})`)
                 .selectAll('circle')
                 .attr('r', d => d.r)
@@ -100,11 +101,11 @@ export class Bubbles {
             .selectAll('g')
             .transition()
             .attr('transform', (n, i) => translate(n, i))
+            .duration(this.animTime)
             .selectAll('circle')
             .attr('r', n => {
                 const [start, end] = nameToPos[n.data.text];
                 return (end - start) / 2
-            })
-            .duration(this.animTime);
+            });
     }
 }
