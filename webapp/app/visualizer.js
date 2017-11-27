@@ -5,10 +5,6 @@ import { bb } from 'billboard.js';
 export class Visualizer {
     constructor(selector) {
         this.selector = selector;
-        d3.select('#' + selector)
-            .append('div')
-            .attr('class', 'stats');
-        this.divExists = true;
     }
 
     draw() {
