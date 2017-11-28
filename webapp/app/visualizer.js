@@ -8,7 +8,6 @@ export class Visualizer {
         this.animTime = animTime;
         this.createDivs();
         this.divExists = true;
-
     }
 
     createDivs() {
@@ -109,11 +108,11 @@ export class Visualizer {
         const bubbleData = [{
             value: this.retweets,
             x: w / 2 - h,
-            img: dataUrl.replace('data.json', 'retweet.svg')
+            img: serverUrl + 'retweet.svg'
         }, {
             value: this.likes,
             x: w / 2 + h,
-            img: dataUrl.replace('data.json', 'twit_heart.png')
+            img: serverUrl + 'twit_heart.png'
         }];
 
         const startSelector = d3.select(this.selector)
