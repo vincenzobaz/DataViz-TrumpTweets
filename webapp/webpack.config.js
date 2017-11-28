@@ -42,7 +42,7 @@ module.exports = {
   plugins: [
     new ExtractTextPlugin({filename: 'main.css'}),
     new webpack.DefinePlugin({
-      'dataUrl': JSON.stringify('http://localhost:8000/data.json')
+      'serverUrl': JSON.stringify('http://localhost:8000/')
     }),
     //new webpack.HotModuleReplacementPlugin(),
     new OpenBrowserPlugin({ url: 'http://localhost:8080' }),
