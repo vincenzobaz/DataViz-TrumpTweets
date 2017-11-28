@@ -4,7 +4,6 @@ import { bb } from 'billboard.js';
 let i = 0;
 export class Visualizer {
     constructor(selector, animTime = 500) {
-        console.log(selector)
         this.selector = '#' + selector;
         this.animTime = animTime;
         this.createDivs();
@@ -18,7 +17,7 @@ export class Visualizer {
             .attr('class', 'stats')
             .style('opacity', 0);
 
-        let divs = ['timeseries', 'word-usage', 'link-bar'].map(id => bigBox.append('div').attr('id', id))
+        let divs = ['timeseries', 'word-usage', 'link-bar', 'bubbles'].map(id => bigBox.append('div').attr('id', id))
         divs = [bigBox, ...divs];
         divs.forEach(div => div.transition().style('opacity', 1).delay(this.animTime).duration(this.animTime));
         this.divExists = true;
@@ -104,29 +103,53 @@ export class Visualizer {
             bindto: "#link-bar"
         });
 
-        /* TODO: Implement bubbles, see bubbles.js for an idea
-        const bubbleData = [['Retweets', this.retweets], ['Stars', this.likes]];
-        const startSelector = d3.select('#' + this.selector)
-            .select('.stats')
-            .append('div')
-            .id('stats-bubbles')
+        const h = d3.select(this.selector).select('#bubbles').node().clientHeight;
+        const w = d3.select(this.selector).select('#bubbles').node().clientWidth;
+
+        const bubbleData = [{
+            value: this.retweets,
+            x: w / 2 - h,
+            img: dataUrl.replace('data.json', 'retweet.svg')
+        }, {
+            value: this.likes,
+            x: w / 2 + h,
+            img: dataUrl.replace('data.json', 'twit_heart.png')
+        }];
+
+        const startSelector = d3.select(this.selector)
+            .select('#bubbles')
             .append('svg')
+            .attr('height', '100%')
+            .attr('width', '100%')
             .selectAll('g')
             .data(bubbleData)
             .enter()
             .append('g')
-            .attr('transform', )
-        */
+            .attr('transform', d => `translate(${d.x}, 0)`)
+
+        const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+        startSelector.append('image')
+            .attr('width', h)
+            .attr('height', h)
+            .attr('xlink:href', d => d.img)
+
+       startSelector.append('text')
+            .attr('y', h / 2)
+            .attr('x', h / 2)
+            .attr('text-anchor', 'middle')
+            .attr('alignment-baseline', 'middle')
+            .text(b => b.value);
     }
 
     hide() {
         if (this.divExists) {
             d3.select(this.selector)
                 .select('.stats')
-                //.transition()
-                //.style('opacity', 0) // Crashes :()
-                //.duration(0)
                 .remove();
+            //.transition()
+            //.style('opacity', 0) // Crashes :()
+            //.duration(0)
             this.divExists = false;
         }
     }
