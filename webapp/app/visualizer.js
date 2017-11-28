@@ -127,8 +127,6 @@ export class Visualizer {
             .append('g')
             .attr('transform', d => `translate(${d.x}, 0)`)
 
-        const color = d3.scaleOrdinal(d3.schemeCategory10);
-
         startSelector.append('image')
             .attr('width', h)
             .attr('height', h)
