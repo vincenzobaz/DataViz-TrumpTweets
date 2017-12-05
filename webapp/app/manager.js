@@ -25,7 +25,7 @@ export class Manager {
                 .attr('id', this.id);
         }
         const bubblePlot = new Bubbles('#' + this.id, this.bubbles, [contentWidth, contentHeight], [flattenedBubblesWidth, contentHeight])
-        bubblePlot.drawFull();
+        bubblePlot.draw();
     }
 
     hide() {

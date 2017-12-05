@@ -15,10 +15,13 @@ export class Bubbles {
         // Store new bubbles objects
         this.bubbles = root.children;
 
-        // Copy packed coordinates, x,y will be modified by simulation
         this.bubbles.forEach(b => {
-            b.packed_x = b.x;
-            b.packed_y = b.y;
+            // Copy packed coordinates, x,y,r will be modified by simulation
+            b.packedX = b.x;
+            b.packedY = b.y;
+            b.packedR = b.r;
+            // Give pretty names
+            b.prettyText = _.capitalize(b.data.text.replace('_', ' '));
         });
 
         // Store class attributes
@@ -27,15 +30,14 @@ export class Bubbles {
         this.dimensionsCollapsed = dimensionsCollapsed;
         this.animTime = animTime;
         this.selector = selector;
-        // Prepare and store svg
-        this.svg = d3.select(this.selector)
-            .append('svg')
+        // Prepare and store canvas
+        this.canvas = d3.select(this.selector)
+            .append('canvas')
             .attr('id', 'svg-bubbles')
-            .attr('viewBox', `0 0 ${dimensionsFull[0]} ${dimensionsFull[1]}`)
             .attr('width', dimensionsFull[0])
             .attr('height', dimensionsFull[1]);
-        this.drawn = false;
-
+        // and its 2d Context
+        this.context = this.canvas.node().getContext('2d');
     }
 
     startSimulation() {
@@ -44,13 +46,26 @@ export class Bubbles {
 
         const simulation = d3.forceSimulation(this.bubbles)
             .force('collide', d3.forceCollide(b => b.r))
-            .on('tick', this.drawFull.bind(this, false));
+            .on('tick', this.draw.bind(this, false));
 
         // Enable drag&drop
-        this.svg.call(d3.drag()
+        this.canvas.call(d3.drag()
             .subject(() => simulation.find(d3.event.x, d3.event.y))
             .on('start', () => {
-                if (!d3.event.active) simulation.alphaTarget(1).restart();
+                if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+                if (!this.buttonAdded) {
+                    d3.select(this.selector)
+                        .append('button')
+                        .attr('type', 'button')
+                        .attr('id', 'reset-bubbles-button')
+                        .attr('class', 'btn btn-warning btn-lg')
+                        .html('Reset bubbles')
+                        .on('click', () => {
+                            this.reset();
+                            this.draw()
+                        });
+                    this.buttonAdded = true;
+                }
             })
             .on('drag', () => {
                 d3.event.subject.fx = d3.event.x;
@@ -62,74 +77,71 @@ export class Bubbles {
                 d3.event.subject.fy = null;
             })
         );
-
         this.simulation = simulation;
+    }
+
+    reset() {
+        this.bubbles.forEach(b => {
+            b.x = b.packedX;
+            b.y = b.packedY;
+            b.r = b.packedR;
+        })
+        if (this.buttonAdded) {
+            d3.select(this.selector)
+              .select('#reset-bubbles-button')
+              .remove();
+            this.buttonAdded = false;
+        }
     }
 
     stopSimualtion() {
         this.simulation.stop();
         this.simulation = null;
-
         // Disable drag&drop
-        this.svg.on('mousedown.drag', null);
+        this.canvas.on('mousedown.drag', null);
     }
 
     callback(layout_bubble) {
         // Click on already selected => reset
         if (this.selectedBubble && layout_bubble.data.text === this.selectedBubble) {
             this.selectedBubble = null;
-            this.drawFull(true);
+            this.reset();
+            this.draw();
             this.startSimulation();
         } else { // Otherwise select new bubble and redraw
             this.selectedBubble = layout_bubble.data.text;
-            this.drawCollapsed();
+            this.collapse();
+            this.draw();
             this.stopSimualtion();
         }
         // Execute bubble callback if one was provided
         if (_.has(layout_bubble.data, 'callback')) layout_bubble.data.callback();
     }
 
-    drawFull(reset) {
-        if (reset) {
-            this.bubbles.forEach(b => {
-                b.x = b.packed_x;
-                b.y = b.packed_y;
-            })
-        }
+    draw() {
+        const [width, height] = this.dimensionsFull;
+        const ctx = this.context;
+        ctx.clearRect(0, 0, width, height);
+        const color = d3.scaleOrdinal(d3.schemeCategory10);
+        this.bubbles.forEach(b => {
+            ctx.beginPath();
+            ctx.moveTo(b.x + b.r, b.y);
+            ctx.arc(b.x, b.y, b.r, 0, 2 * Math.PI);
+            ctx.fillStyle = color(b.data.size);
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.stroke();
 
-        if (!this.drawn) {
-            const [width, height] = this.dimensionsFull;
-            const start = this.svg.selectAll('g')
-                .data(this.bubbles)
-                .enter()
-                .append('g')
-                .attr('transform', layout_bubble => `translate(${layout_bubble.x}, ${layout_bubble.y})`)
-                .on('click', this.callback.bind(this));
+            ctx.fillStyle = 'black';
+            ctx.textAlign = 'center';
+            ctx.fillText(b.prettyText, b.x, b.y);
+            ctx.closePath();
+        })
 
-            const color = d3.scaleOrdinal(d3.schemeCategory10);
-            start.append('circle')
-                .attr('fill', b => color(b.data.size))
-                .attr('r', b => b.r);
-
-            start.append('text')
-                .attr('text-anchor', 'middle')
-                .attr('alignment-baseline', 'middle')
-                .text(b => _.capitalize(b.data.text.replace('_', ' ')));
-            this.drawn = true;
-            this.startSimulation(); // Need to be here too for first launch. Method avoids recreating if already exists.
-        } else {
-            this.svg.selectAll('g')
-                .transition()
-                .delay(this.animTime)
-                .attr('transform', d => `translate(${d.x}, ${d.y})`)
-                .selectAll('circle')
-                .attr('r', d => d.r)
-                .duration(this.animTime);
-        }
+        this.startSimulation(); // Need to be here too for first launch. Method avoids recreating if already exists.
     }
 
-
-    drawCollapsed() {
+    collapse() {
         const padding = 10;
         const padCount = this.bubbles.length - 1;
         const specialSize = this.dimensionsCollapsed[0];
@@ -147,9 +159,18 @@ export class Bubbles {
             const [start, end] = nameToPos[node.data.text];
             let y = start + (end - start) / 2;
             y = index > 0 ? y + padding : y;
-            return `translate(${x}, ${y})`;
+            return [x, y];
         };
 
+        this.bubbles.forEach((b, idx) => {
+            const [x, y] = translate(b, idx);
+            b.x = x;
+            b.y = y;
+            b.r = y;
+        })
+        console.log('collapsed')
+
+        /*
         this.svg.selectAll('g')
             .transition()
             .attr('transform', (n, i) => translate(n, i))
@@ -159,5 +180,6 @@ export class Bubbles {
                 const [start, end] = nameToPos[n.data.text];
                 return (end - start) / 2
             });
+        */
     }
 }
