@@ -40,6 +40,31 @@ export class Bubbles {
         this.context = this.canvas.node().getContext('2d');
     }
 
+    addResetButton() {
+        if (!this.buttonAdded) {
+            d3.select(this.selector)
+                .append('button')
+                .attr('type', 'button')
+                .attr('id', 'reset-bubbles-button')
+                .attr('class', 'btn btn-warning btn-lg')
+                .html('Reset bubbles')
+                .on('click', () => {
+                    this.reset();
+                    this.draw()
+                });
+            this.buttonAdded = true;
+        }
+    }
+
+    deleteResetButton() {
+        if (this.buttonAdded) {
+            d3.select(this.selector)
+                .select('#reset-bubbles-button')
+                .remove();
+            this.buttonAdded = false;
+        }
+    }
+
     startSimulation() {
         // Check if already running before instantiating new one;
         if (this.simulation) return;
@@ -52,26 +77,20 @@ export class Bubbles {
         this.canvas.call(d3.drag()
             .subject(() => simulation.find(d3.event.x, d3.event.y))
             .on('start', () => {
+                this.dragging = false;
                 if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-                if (!this.buttonAdded) {
-                    d3.select(this.selector)
-                        .append('button')
-                        .attr('type', 'button')
-                        .attr('id', 'reset-bubbles-button')
-                        .attr('class', 'btn btn-warning btn-lg')
-                        .html('Reset bubbles')
-                        .on('click', () => {
-                            this.reset();
-                            this.draw()
-                        });
-                    this.buttonAdded = true;
-                }
             })
             .on('drag', () => {
-                d3.event.subject.fx = d3.event.x;
-                d3.event.subject.fy = d3.event.y;
+                if (!this.collapsed) this.addResetButton()
+                this.dragging = true;
+                if (!this.collapsed) {
+                    d3.event.subject.fx = d3.event.x;
+                    d3.event.subject.fy = d3.event.y;
+                }
             })
             .on('end', () => {
+                if (!this.dragging) this.callback(d3.event.subject);
+                this.dragging = false;
                 if (!d3.event.active) simulation.alphaTarget(0);
                 d3.event.subject.fx = null;
                 d3.event.subject.fy = null;
@@ -86,33 +105,29 @@ export class Bubbles {
             b.y = b.packedY;
             b.r = b.packedR;
         })
-        if (this.buttonAdded) {
-            d3.select(this.selector)
-              .select('#reset-bubbles-button')
-              .remove();
-            this.buttonAdded = false;
-        }
+        this.deleteResetButton()
     }
 
-    stopSimualtion() {
+    stopSimulation() {
         this.simulation.stop();
         this.simulation = null;
-        // Disable drag&drop
-        this.canvas.on('mousedown.drag', null);
     }
 
     callback(layout_bubble) {
+        this.reset();
         // Click on already selected => reset
         if (this.selectedBubble && layout_bubble.data.text === this.selectedBubble) {
+            this.collapsed = false;
             this.selectedBubble = null;
-            this.reset();
             this.draw();
             this.startSimulation();
         } else { // Otherwise select new bubble and redraw
+            this.collapsed = true;
             this.selectedBubble = layout_bubble.data.text;
+            this.deleteResetButton();
+            this.stopSimulation();
             this.collapse();
             this.draw();
-            this.stopSimualtion();
         }
         // Execute bubble callback if one was provided
         if (_.has(layout_bubble.data, 'callback')) layout_bubble.data.callback();
@@ -142,7 +157,6 @@ export class Bubbles {
     }
 
     collapse() {
-        const padding = 10;
         const padCount = this.bubbles.length - 1;
         const specialSize = this.dimensionsCollapsed[0];
         const normalSize = (this.dimensionsCollapsed[1] - this.dimensionsCollapsed[0]) / (this.bubbles.length - 1);
@@ -155,31 +169,14 @@ export class Bubbles {
 
         const x = _.max(startToEnd.map(t => (t[1] - t[0]) / 2));
 
-        const translate = (node, index) => {
-            const [start, end] = nameToPos[node.data.text];
-            let y = start + (end - start) / 2;
-            y = index > 0 ? y + padding : y;
-            return [x, y];
-        };
-
         this.bubbles.forEach((b, idx) => {
-            const [x, y] = translate(b, idx);
+            const [start, end] = nameToPos[b.data.text];
+            const r = (end - start) / 2;
+            const y = start + r;
+
             b.x = x;
             b.y = y;
-            b.r = y;
+            b.r = r;
         })
-        console.log('collapsed')
-
-        /*
-        this.svg.selectAll('g')
-            .transition()
-            .attr('transform', (n, i) => translate(n, i))
-            .duration(this.animTime)
-            .selectAll('circle')
-            .attr('r', n => {
-                const [start, end] = nameToPos[n.data.text];
-                return (end - start) / 2
-            });
-        */
-    }
+   }
 }
