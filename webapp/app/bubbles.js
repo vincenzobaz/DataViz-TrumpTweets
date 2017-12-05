@@ -50,7 +50,7 @@ export class Bubbles {
                 .html('Reset bubbles')
                 .on('click', () => {
                     this.reset();
-                    this.draw()
+                    this.draw();
                 });
             this.buttonAdded = true;
         }
@@ -81,9 +81,9 @@ export class Bubbles {
                 if (!d3.event.active) simulation.alphaTarget(0.3).restart();
             })
             .on('drag', () => {
-                if (!this.collapsed) this.addResetButton()
                 this.dragging = true;
                 if (!this.collapsed) {
+                    this.addResetButton();
                     d3.event.subject.fx = d3.event.x;
                     d3.event.subject.fy = d3.event.y;
                 }
@@ -157,7 +157,6 @@ export class Bubbles {
     }
 
     collapse() {
-        const padCount = this.bubbles.length - 1;
         const specialSize = this.dimensionsCollapsed[0];
         const normalSize = (this.dimensionsCollapsed[1] - this.dimensionsCollapsed[0]) / (this.bubbles.length - 1);
         const newSizes = this.bubbles.map(b => b.data.text === this.selectedBubble ? specialSize : normalSize)
