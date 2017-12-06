@@ -40,6 +40,7 @@ export class Bubbles {
         this.context = this.canvas.node().getContext('2d');
         // Create physics simulator
         this.simulation = d3.forceSimulation(this.bubbles);
+        this.startSimulation();
     }
 
     startSimulation() {
@@ -129,7 +130,7 @@ export class Bubbles {
             ctx.closePath();
         })
 
-        this.startSimulation(); // Need to be here too for first launch. Method avoids recreating if already exists.
+        //this.startSimulation(); // Need to be here too for first launch. Method avoids recreating if already exists.
     }
 
     collapse() {
