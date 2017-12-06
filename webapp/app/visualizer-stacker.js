@@ -1,7 +1,9 @@
 import * as _ from 'lodash';
+import { Visualizer } from './visualizer';
 
-export class VisualizerStacker {
-    constructor(visualizers) {
+export class VisualizerStacker extends Visualizer {
+    constructor(visualizers, animTime = 500) {
+        super('multiple', animTime);
         const prepareForMerge = (vis, field) => _.fromPairs(_.zip(vis[field][0], vis[field][1].slice(1)));
         const mergeConcat = (o1, o2) => _.mergeWith(o1, o2, (a, b) => _.flatten([a, b]));
         const unzipAndFilter = ob => _.filter(_.toPairs(ob), tup => tup[1].length == visualizers.length)
@@ -20,15 +22,17 @@ export class VisualizerStacker {
         }
 
         // Format: [[word/linkword/date, [count1, count2...]]]
-        wordData = unzipAndFilter(wordData);
-        linkData = unzipAndFilter(linkData);
-        timeData = unzipAndFilter(timeData);
+        this.wordData = unzipAndFilter(wordData);
+        this.linkData = unzipAndFilter(linkData);
+        this.timeData = unzipAndFilter(timeData);
         // Format: [retweetsTweet]
-        let retweets = visualizers.map(v => v.retweets);
+        this.retweets = visualizers.map(v => v.retweets);
         // Format: [likesTweet]
-        let likes = visualizers.map(v => v.likes);
+        this.likes = visualizers.map(v => v.likes);
+    }
 
-
+    draw() {
+        console.log('To implement');
     }
 
 }

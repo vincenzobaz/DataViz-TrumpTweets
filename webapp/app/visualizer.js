@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import * as _ from 'lodash';
 import { bb } from 'billboard.js';
-let i = 0;
+
 export class Visualizer {
     constructor(selector, animTime = 500) {
         this.selector = '#' + selector;
