@@ -44,4 +44,7 @@ export class SentimentsManager extends Manager {
         );
     }
 
+    compareMultiple(bubbles) {
+        console.log('Asked to compare emotions ' + bubbles.map(b => b.data.text));
+    }
 }

@@ -20,4 +20,7 @@ export class TopicsManager extends Manager {
         return new TopicVisualizer('topics-content', this.tweetsByTopic[topic])
     }
 
+    compareMultiple(bubbles) {
+        console.log('Asked to compare topics ' + bubbles.map(b => b.data.text));
+    }
 }

@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import * as _ from 'lodash';
 
 export class Bubbles {
-    constructor(selector, bubbles, dimensionsFull, dimensionsCollapsed, animTime = 500) {
+    constructor(selector, bubbles, dimensionsFull, dimensionsCollapsed, compareMultiple, animTime = 500) {
         // Compute coordinates for bubbles
         const layout = d3.pack()
             .size(dimensionsFull)
@@ -30,6 +30,7 @@ export class Bubbles {
         this.dimensionsCollapsed = dimensionsCollapsed;
         this.animTime = animTime;
         this.selector = selector;
+        this.compareMultiple = compareMultiple;
         // Prepare and store canvas
         this.canvas = d3.select(this.selector)
             .append('canvas')
@@ -41,6 +42,8 @@ export class Bubbles {
         // Create physics simulator
         this.simulation = d3.forceSimulation(this.bubbles);
         this.startSimulation();
+
+        this.drawnButtons = false;
     }
 
     startDragging() {
@@ -68,8 +71,8 @@ export class Bubbles {
             this.removeForcesFromBubble(d3.event.subject);
             // Add bubble to list of selected
             this.selectedBubbles = [..._.get(this, 'selectedBubbles', []), d3.event.subject];
+            this.addMultipleSelectionButtons();
             this.collapse(this.selectedBubbles);
-            console.log(this.selectedBubbles)
         }
 
         this.dragging = false;
@@ -138,7 +141,7 @@ export class Bubbles {
         const normalSize = (this.dimensionsCollapsed[1] - this.dimensionsCollapsed[0]) / (bubbles.length - 1);
 
         const newSizes = selected != null ? bubbles.map(b => selected.includes(b.data.text) ? specialSize : normalSize)
-                                          : Array(bubbles.length).fill(this.dimensionsCollapsed[1] / bubbles.length);
+            : Array(bubbles.length).fill(this.dimensionsCollapsed[1] / bubbles.length);
 
         for (let i = 1; i < newSizes.length; ++i) {
             newSizes[i] += newSizes[i - 1];
@@ -156,7 +159,37 @@ export class Bubbles {
             b.x = x;
             b.y = y;
             b.r = _.clamp(r, 0, this.dimensionsCollapsed[0] / 2);
-        })
+        });
+    }
+
+    addMultipleSelectionButtons() {
+        if (this.drawnButtons) return;
+        const div = d3.select(this.selector)
+            .append('div')
+            .attr('id', 'selection-buttons');
+
+        div.append('button')
+            .attr('type', 'button')
+            .attr('class', 'btn btn-success btn-block')
+            .html('Compare')
+            .on('click', () => this.compareMultiple(this.selectedBubbles));
+
+        const emptySelection = () => {
+            this.simulation.nodes([...this.simulation.nodes(), ...this.selectedBubbles]);
+            this.selectedBubbles = [];
+        };
+
+        div.append('button')
+            .attr('type', 'button')
+            .attr('class', 'btn btn-danger btn-block')
+            .html('Reset')
+            .on('click', emptySelection);
+        this.drawnButtons = true;
+    }
+
+    removeMultipleSelectionButtons() {
+        d3.select(this.selector).select('#selection-buttons').remove();
+        this.drawnButtons = false;
     }
 
     draw() {
@@ -164,6 +197,8 @@ export class Bubbles {
         const ctx = this.context;
 
         ctx.clearRect(0, 0, width, height);
+
+        if (!this.selectedBubbles || !this.selectedBubbles.length) this.removeMultipleSelectionButtons();
 
         if (this.dragging || (this.selectedBubbles && this.selectedBubbles.length)) {
             ctx.beginPath();

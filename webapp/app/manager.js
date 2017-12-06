@@ -24,7 +24,7 @@ export class Manager {
                 .append('div')
                 .attr('id', this.id);
         }
-        const bubblePlot = new Bubbles('#' + this.id, this.bubbles, [contentWidth, contentHeight], [flattenedBubblesWidth, contentHeight])
+        const bubblePlot = new Bubbles('#' + this.id, this.bubbles, [contentWidth, contentHeight], [flattenedBubblesWidth, contentHeight], this.compareMultiple.bind(this))
         bubblePlot.draw();
     }
 

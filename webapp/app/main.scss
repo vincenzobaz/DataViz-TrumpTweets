@@ -97,8 +97,8 @@ $flattened-bubbles-width: 12%;
   text-align: center;
 }
 
-#reset-bubbles-button {
+#selection-buttons {
+  width: $flattened-bubbles-width;
   position: absolute;
-  top: 0;
-  left: 0;
+  bottom: 0;
 }
