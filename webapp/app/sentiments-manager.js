@@ -43,8 +43,4 @@ export class SentimentsManager extends Manager {
             this.tweetsWith(sentiment)
         );
     }
-
-    compareMultiple(bubbles) {
-        console.log('Asked to compare emotions ' + bubbles.map(b => b.data.text));
-    }
 }
