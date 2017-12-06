@@ -38,52 +38,27 @@ export class Bubbles {
             .attr('height', dimensionsFull[1]);
         // and its 2d Context
         this.context = this.canvas.node().getContext('2d');
-    }
-
-    addResetButton() {
-        if (!this.buttonAdded) {
-            d3.select(this.selector)
-                .append('button')
-                .attr('type', 'button')
-                .attr('id', 'reset-bubbles-button')
-                .attr('class', 'btn btn-warning btn-lg')
-                .html('Reset bubbles')
-                .on('click', () => {
-                    this.reset();
-                    this.draw();
-                });
-            this.buttonAdded = true;
-        }
-    }
-
-    deleteResetButton() {
-        if (this.buttonAdded) {
-            d3.select(this.selector)
-                .select('#reset-bubbles-button')
-                .remove();
-            this.buttonAdded = false;
-        }
+        // Create physics simulator
+        this.simulation = d3.forceSimulation(this.bubbles);
     }
 
     startSimulation() {
-        // Check if already running before instantiating new one;
-        if (this.simulation) return;
-
-        const simulation = d3.forceSimulation(this.bubbles)
-            .force('collide', d3.forceCollide(b => b.r))
+        if (this.simulationRunning) return;
+        this.simulation.force('collide', d3.forceCollide(b => b.r + 5).iterations(5))
+            .force('xf', d3.forceX(this.dimensionsFull[0] / 2))
+            .force('yf', d3.forceY(this.dimensionsFull[1] / 2))
             .on('tick', this.draw.bind(this, false));
 
         // Enable drag&drop
         this.canvas.call(d3.drag()
-            .subject(() => simulation.find(d3.event.x, d3.event.y))
+            .subject(() => this.simulation.find(d3.event.x, d3.event.y))
             .on('start', () => {
                 this.dragging = false;
-                if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+                if (!d3.event.active) this.simulation.alphaTarget(0.3).restart();
             })
             .on('drag', () => {
                 this.dragging = true;
                 if (!this.collapsed) {
-                    this.addResetButton();
                     d3.event.subject.fx = d3.event.x;
                     d3.event.subject.fy = d3.event.y;
                 }
@@ -91,12 +66,12 @@ export class Bubbles {
             .on('end', () => {
                 if (!this.dragging) this.callback(d3.event.subject);
                 this.dragging = false;
-                if (!d3.event.active) simulation.alphaTarget(0);
+                if (!d3.event.active) this.simulation.alphaTarget(0);
                 d3.event.subject.fx = null;
                 d3.event.subject.fy = null;
             })
         );
-        this.simulation = simulation;
+        this.simulationRunning = true;
     }
 
     reset() {
@@ -105,12 +80,14 @@ export class Bubbles {
             b.y = b.packedY;
             b.r = b.packedR;
         })
-        this.deleteResetButton()
     }
 
     stopSimulation() {
-        this.simulation.stop();
-        this.simulation = null;
+        // Remove forces from simulation
+        this.simulation.force('xf', null)
+                       .force('yf', null)
+                       .force('collide', null);
+        this.simulationRunning = false;
     }
 
     callback(layout_bubble) {
@@ -124,7 +101,6 @@ export class Bubbles {
         } else { // Otherwise select new bubble and redraw
             this.collapsed = true;
             this.selectedBubble = layout_bubble.data.text;
-            this.deleteResetButton();
             this.stopSimulation();
             this.collapse();
             this.draw();
