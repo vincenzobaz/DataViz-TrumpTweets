@@ -43,6 +43,27 @@ export class Bubbles {
         this.startSimulation();
     }
 
+    startDragging() {
+        this.dragging = false;
+        if (!d3.event.active) this.simulation.alphaTarget(0.3).restart();
+    }
+
+    duringDragging() {
+        this.dragging = true;
+        if (!this.collapsed) {
+            d3.event.subject.fx = d3.event.x;
+            d3.event.subject.fy = d3.event.y;
+        }
+    }
+
+    endDraggin() {
+        if (!this.dragging) this.callback(d3.event.subject);
+        this.dragging = false;
+        if (!d3.event.active) this.simulation.alphaTarget(0);
+        d3.event.subject.fx = null;
+        d3.event.subject.fy = null;
+    }
+
     startSimulation() {
         if (this.simulationRunning) return;
         this.simulation.force('collide', d3.forceCollide(b => b.r + 5).iterations(5))
@@ -53,26 +74,19 @@ export class Bubbles {
         // Enable drag&drop
         this.canvas.call(d3.drag()
             .subject(() => this.simulation.find(d3.event.x, d3.event.y))
-            .on('start', () => {
-                this.dragging = false;
-                if (!d3.event.active) this.simulation.alphaTarget(0.3).restart();
-            })
-            .on('drag', () => {
-                this.dragging = true;
-                if (!this.collapsed) {
-                    d3.event.subject.fx = d3.event.x;
-                    d3.event.subject.fy = d3.event.y;
-                }
-            })
-            .on('end', () => {
-                if (!this.dragging) this.callback(d3.event.subject);
-                this.dragging = false;
-                if (!d3.event.active) this.simulation.alphaTarget(0);
-                d3.event.subject.fx = null;
-                d3.event.subject.fy = null;
-            })
+            .on('start', this.startDragging.bind(this))
+            .on('drag', this.duringDragging.bind(this))
+            .on('end', this.endDraggin.bind(this))
         );
         this.simulationRunning = true;
+    }
+
+    stopSimulation() {
+        // Remove forces from simulation
+        this.simulation.force('xf', null)
+            .force('yf', null)
+            .force('collide', null);
+        this.simulationRunning = false;
     }
 
     reset() {
@@ -80,18 +94,10 @@ export class Bubbles {
             b.x = b.packedX;
             b.y = b.packedY;
             b.r = b.packedR;
-        })
+        });
     }
 
-    stopSimulation() {
-        // Remove forces from simulation
-        this.simulation.force('xf', null)
-                       .force('yf', null)
-                       .force('collide', null);
-        this.simulationRunning = false;
-    }
-
-    callback(layout_bubble) {
+   callback(layout_bubble) {
         this.reset();
         // Click on already selected => reset
         if (this.selectedBubble && layout_bubble.data.text === this.selectedBubble) {
@@ -110,30 +116,7 @@ export class Bubbles {
         if (_.has(layout_bubble.data, 'callback')) layout_bubble.data.callback();
     }
 
-    draw() {
-        const [width, height] = this.dimensionsFull;
-        const ctx = this.context;
-        ctx.clearRect(0, 0, width, height);
-        const color = d3.scaleOrdinal(d3.schemeCategory10);
-        this.bubbles.forEach(b => {
-            ctx.beginPath();
-            ctx.moveTo(b.x + b.r, b.y);
-            ctx.arc(b.x, b.y, b.r, 0, 2 * Math.PI);
-            ctx.fillStyle = color(b.data.size);
-            ctx.fill();
-            ctx.strokeStyle = '#fff';
-            ctx.stroke();
-
-            ctx.fillStyle = 'black';
-            ctx.textAlign = 'center';
-            ctx.fillText(b.prettyText, b.x, b.y);
-            ctx.closePath();
-        })
-
-        //this.startSimulation(); // Need to be here too for first launch. Method avoids recreating if already exists.
-    }
-
-    collapse() {
+   collapse() {
         const specialSize = this.dimensionsCollapsed[0];
         const normalSize = (this.dimensionsCollapsed[1] - this.dimensionsCollapsed[0]) / (this.bubbles.length - 1);
         const newSizes = this.bubbles.map(b => b.data.text === this.selectedBubble ? specialSize : normalSize)
@@ -154,5 +137,26 @@ export class Bubbles {
             b.y = y;
             b.r = r;
         })
-   }
+    }
+
+    draw() {
+        const [width, height] = this.dimensionsFull;
+        const ctx = this.context;
+        ctx.clearRect(0, 0, width, height);
+        const color = d3.scaleOrdinal(d3.schemeCategory10);
+        this.bubbles.forEach(b => {
+            ctx.beginPath();
+            ctx.moveTo(b.x + b.r, b.y);
+            ctx.arc(b.x, b.y, b.r, 0, 2 * Math.PI);
+            ctx.fillStyle = color(b.data.size);
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.stroke();
+
+            ctx.fillStyle = 'black';
+            ctx.textAlign = 'center';
+            ctx.fillText(b.prettyText, b.x, b.y);
+            ctx.closePath();
+        });
+    }
 }
