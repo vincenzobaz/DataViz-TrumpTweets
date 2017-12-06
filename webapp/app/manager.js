@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import { Bubbles } from './bubbles';
+import { VisualizerStacker } from './visualizer-stacker';
 
 
 export class Manager {
@@ -28,6 +29,12 @@ export class Manager {
         bubblePlot.draw();
     }
 
+    compareMultiple(names) {
+        const visualizers = names.map(n => this.getVisualizer(n));
+        this.visualizer = new VisualizerStacker(visualizers);
+        this.focusOn('multiple');
+    }
+
     hide() {
         d3.select(this.selector)
             .select('#' + this.id)
@@ -40,10 +47,11 @@ export class Manager {
         // Nothing is selected, create viz
         if (this.focusedOn == newFocus) {
             this.visualizer.hide();
+            this.visualizer = null;
             this.focusedOn = null;
         } else {
             if (this.focusedOn) this.visualizer.hide();
-            this.visualizer = this.getVisualizer(newFocus);
+            this.visualizer = this.visualizer ? this.visualizer : this.getVisualizer(newFocus);
             this.visualizer.draw();
             this.focusedOn = newFocus;
         }
