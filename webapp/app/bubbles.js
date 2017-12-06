@@ -66,7 +66,7 @@ export class Bubbles {
         d3.event.subject.fy = null;
 
         // Multiple selection through drag and drop
-        if (this.dragging && d3.event.subject.x < this.dimensionsCollapsed[0]) {
+        if (this.dragging && !this.collapsed && d3.event.subject.x < this.dimensionsCollapsed[0]) {
             // Disable forces if in selection area
             this.removeForcesFromBubble(d3.event.subject);
             // Add bubble to list of selected
@@ -172,7 +172,7 @@ export class Bubbles {
             .attr('type', 'button')
             .attr('class', 'btn btn-success btn-block')
             .html('Compare')
-            .on('click', () => this.compareMultiple(this.selectedBubbles));
+            .on('click', () => this.compareMultiple(this.selectedBubbles.map(b => b.data.text)));
 
         const emptySelection = () => {
             this.simulation.nodes([...this.simulation.nodes(), ...this.selectedBubbles]);
