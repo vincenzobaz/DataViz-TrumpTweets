@@ -50,18 +50,33 @@ export class Bubbles {
 
     duringDragging() {
         this.dragging = true;
-        if (!this.collapsed) {
-            d3.event.subject.fx = d3.event.x;
-            d3.event.subject.fy = d3.event.y;
-        }
+        if (this.collapsed) return;
+
+        d3.event.subject.fx = d3.event.x;
+        d3.event.subject.fy = d3.event.y;
     }
 
     endDraggin() {
         if (!this.dragging) this.callback(d3.event.subject);
-        this.dragging = false;
         if (!d3.event.active) this.simulation.alphaTarget(0);
         d3.event.subject.fx = null;
         d3.event.subject.fy = null;
+
+        // Multiple selection through drag and drop
+        if (this.dragging && d3.event.subject.x < this.dimensionsCollapsed[0]) {
+            // Disable forces if in selection area
+            this.removeForcesFromBubble(d3.event.subject);
+            // Add bubble to list of selected
+            this.selectedBubbles = [..._.get(this, 'selectedBubbles', []), d3.event.subject];
+            this.collapse(this.selectedBubbles);
+            console.log(this.selectedBubbles)
+        }
+
+        this.dragging = false;
+    }
+
+    removeForcesFromBubble(b) {
+        this.simulation.nodes(this.simulation.nodes().filter(b1 => b1.data.text != b.data.text));
     }
 
     startSimulation() {
@@ -95,55 +110,73 @@ export class Bubbles {
             b.y = b.packedY;
             b.r = b.packedR;
         });
+        this.selectedBubbles = [];
     }
 
-   callback(layout_bubble) {
+    callback(layout_bubble) {
         this.reset();
         // Click on already selected => reset
         if (this.selectedBubble && layout_bubble.data.text === this.selectedBubble) {
             this.collapsed = false;
             this.selectedBubble = null;
             this.draw();
+            this.simulation.nodes(this.bubbles);
             this.startSimulation();
         } else { // Otherwise select new bubble and redraw
             this.collapsed = true;
             this.selectedBubble = layout_bubble.data.text;
             this.stopSimulation();
-            this.collapse();
+            this.collapse(this.bubbles, [this.selectedBubble]);
             this.draw();
         }
         // Execute bubble callback if one was provided
         if (_.has(layout_bubble.data, 'callback')) layout_bubble.data.callback();
     }
 
-   collapse() {
+    collapse(bubbles, selected = null) {
         const specialSize = this.dimensionsCollapsed[0];
-        const normalSize = (this.dimensionsCollapsed[1] - this.dimensionsCollapsed[0]) / (this.bubbles.length - 1);
-        const newSizes = this.bubbles.map(b => b.data.text === this.selectedBubble ? specialSize : normalSize)
+        const normalSize = (this.dimensionsCollapsed[1] - this.dimensionsCollapsed[0]) / (bubbles.length - 1);
+
+        const newSizes = selected != null ? bubbles.map(b => selected.includes(b.data.text) ? specialSize : normalSize)
+                                          : Array(bubbles.length).fill(this.dimensionsCollapsed[1] / bubbles.length);
+
         for (let i = 1; i < newSizes.length; ++i) {
             newSizes[i] += newSizes[i - 1];
         }
         const startToEnd = _.zip([0, ...newSizes.slice(0, -1)], newSizes);
-        const nameToPos = _.fromPairs(_.zip(this.bubbles.map(b => b.data.text), startToEnd));
+        const nameToPos = _.fromPairs(_.zip(bubbles.map(b => b.data.text), startToEnd));
 
-        const x = _.max(startToEnd.map(t => (t[1] - t[0]) / 2));
+        const x = this.dimensionsCollapsed[0] / 2;
 
-        this.bubbles.forEach((b, idx) => {
+        bubbles.forEach((b, idx) => {
             const [start, end] = nameToPos[b.data.text];
             const r = (end - start) / 2;
             const y = start + r;
 
             b.x = x;
             b.y = y;
-            b.r = r;
+            b.r = _.clamp(r, 0, this.dimensionsCollapsed[0] / 2);
         })
     }
 
     draw() {
         const [width, height] = this.dimensionsFull;
         const ctx = this.context;
+
         ctx.clearRect(0, 0, width, height);
+
+        if (this.dragging || (this.selectedBubbles && this.selectedBubbles.length)) {
+            ctx.beginPath();
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, this.dimensionsCollapsed[0], this.dimensionsCollapsed[1]);
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.fillText('Drag here to compare', this.dimensionsCollapsed[0] / 2, 10, this.dimensionsCollapsed[0]);
+            ctx.closePath();
+        }
+
         const color = d3.scaleOrdinal(d3.schemeCategory10);
+
         this.bubbles.forEach(b => {
             ctx.beginPath();
             ctx.moveTo(b.x + b.r, b.y);
