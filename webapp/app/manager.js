@@ -32,7 +32,8 @@ export class Manager {
     compareMultiple(names) {
         const visualizers = names.map(n => this.getVisualizer(n));
         this.visualizer = new VisualizerStacker(visualizers);
-        this.focusOn('multiple');
+        this.focusedOn = 'multiple';
+        this.visualizer.draw();
     }
 
     hide() {
@@ -51,7 +52,7 @@ export class Manager {
             this.focusedOn = null;
         } else {
             if (this.focusedOn) this.visualizer.hide();
-            this.visualizer = this.visualizer ? this.visualizer : this.getVisualizer(newFocus);
+            this.visualizer = this.getVisualizer(newFocus);
             this.visualizer.draw();
             this.focusedOn = newFocus;
         }
