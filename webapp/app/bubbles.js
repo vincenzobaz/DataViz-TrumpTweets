@@ -85,9 +85,9 @@ export class Bubbles {
     startSimulation() {
         if (this.simulationRunning) return;
         this.simulation.force('collide', d3.forceCollide(b => b.r + 5).iterations(5))
-            .force('xf', d3.forceX(this.dimensionsFull[0] / 2))
-            .force('yf', d3.forceY(this.dimensionsFull[1] / 2))
-            .on('tick', this.draw.bind(this, false));
+            .force('xf', d3.forceX(b => b.packedX).strength(1))
+            .force('yf', d3.forceY(b => b.packedY).strength(1))
+            .on('tick', this.draw.bind(this));
 
         // Enable drag&drop
         this.canvas.call(d3.drag()
@@ -97,6 +97,28 @@ export class Bubbles {
             .on('end', this.endDraggin.bind(this))
         );
         this.simulationRunning = true;
+    }
+
+    activateColllapseForces() {
+        this.bubbles.forEach(b => {
+            b.simulation = d3.forceSimulation([b])
+                .force('cx', d3.forceX(b.cx))
+                .force('cy', d3.forceY(b.cy))
+                .on('tick', () => {
+                    b.r = d3.interpolate(b.cr, b.packedR)(b.simulation.alpha());
+                    this.draw.bind(this)
+                });
+        });
+    }
+
+    deleteColllapseForces() {
+        this.bubbles.forEach(b => {
+            if (!b.simulation) return;
+
+            b.simulation.force('cx', null).force('cy', null)
+            b.simulation.on('tick', null);
+            b.simulation.stop();
+        });
     }
 
     stopSimulation() {
@@ -117,12 +139,12 @@ export class Bubbles {
     }
 
     callback(layout_bubble) {
-        this.reset();
         // Click on already selected => reset
         if (this.selectedBubble && layout_bubble.data.text === this.selectedBubble) {
             this.collapsed = false;
             this.selectedBubble = null;
-            this.draw();
+            this.bubbles.forEach(b => b.r = b.packedR);//this.reset();
+            this.deleteColllapseForces();
             this.simulation.nodes(this.bubbles);
             this.startSimulation();
         } else { // Otherwise select new bubble and redraw
@@ -130,7 +152,7 @@ export class Bubbles {
             this.selectedBubble = layout_bubble.data.text;
             this.stopSimulation();
             this.collapse(this.bubbles, [this.selectedBubble]);
-            this.draw();
+            this.activateColllapseForces();
         }
         // Execute bubble callback if one was provided
         if (_.has(layout_bubble.data, 'callback')) layout_bubble.data.callback();
@@ -156,9 +178,9 @@ export class Bubbles {
             const r = (end - start) / 2;
             const y = start + r;
 
-            b.x = x;
-            b.y = y;
-            b.r = _.clamp(r, 0, this.dimensionsCollapsed[0] / 2);
+            b.cx = x;
+            b.cy = y;
+            b.cr = _.clamp(r, 0, this.dimensionsCollapsed[0] / 2);
         });
     }
 
