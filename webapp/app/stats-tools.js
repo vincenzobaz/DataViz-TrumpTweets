@@ -16,11 +16,11 @@ function breakText(text) {
 }
 
 export function getRetweetCount(tweets) {
-    return _.sumBy(tweets, 'retweet_count');
+    return _.sumBy(tweets, 'retweet_count')/tweets.length;
 }
 
 export function getLikeCount(tweets) {
-    return _.sumBy(tweets, 'favorite_count');
+    return _.sumBy(tweets, 'favorite_count')/tweets.length;
 }
 
 export function getWordUsage(tweets, getCoefficient = t => 1) {
