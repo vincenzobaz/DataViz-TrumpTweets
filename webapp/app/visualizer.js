@@ -16,7 +16,7 @@ export class Visualizer {
             .attr('class', 'stats')
             .style('opacity', 0);
 
-        let divs = ['timeseries', 'word-usage', 'link-bar', 'bubbles'].map(id => bigBox.append('div').attr('id', id))
+        let divs = ['timeseries', 'word-usage', 'link-bar', 'bubbles'].map(id => bigBox.append('div').attr('id', id));
         divs = [bigBox, ...divs];
         divs.forEach(div => div.transition().style('opacity', 1).delay(this.animTime).duration(this.animTime));
         this.divExists = true;
