@@ -72,7 +72,7 @@ export class Visualizer {
                 }
             },
             zoom: {
-                enabled: true
+                enabled: false
             },
             bindto: "#word-usage"
         });
@@ -97,7 +97,7 @@ export class Visualizer {
                 }
             },
             zoom: {
-                enabled: true
+                enabled: false
             },
             bindto: "#link-bar"
         });

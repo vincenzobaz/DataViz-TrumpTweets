@@ -129,7 +129,7 @@ export class VisualizerStacker extends Visualizer {
                 }
             },
             zoom: {
-                enabled: true
+                enabled: false
             },
             bindto: "#word-usage"
         });
@@ -165,7 +165,7 @@ export class VisualizerStacker extends Visualizer {
                 }
             },
             zoom: {
-                enabled: true
+                enabled: false
             },
             bindto: "#link-bar"
         });
