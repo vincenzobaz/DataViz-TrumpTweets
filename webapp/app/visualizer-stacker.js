@@ -43,15 +43,25 @@ export class VisualizerStacker extends Visualizer {
 
         let [dates, usage] = _.unzip(this.timeData);
         usage = usage.map(counts => counts.map(c => c != undefined ? c : 0));
-        const [usageTopic1, usageTopic2] = _.unzip(usage);
 
+        let usageColumns = [];
+
+        for (let index in usage[0]) {
+            usageColumns.push(['Usage Topic ' + index.toString()])
+        }
+
+        for (let index in usage) {
+
+            for (let index2 in usage[index]) {
+                usageColumns[index2].push(usage[index][index2])
+            }
+        }
         bb.generate({
             data: {
                 x: "x",
                 columns: [
                     ["x", ...dates],
-                    ["topic1", ...usageTopic1],
-                    ["topic2", ...usageTopic2]
+                    ...usageColumns
                 ]
             },
             axis: {
@@ -74,14 +84,29 @@ export class VisualizerStacker extends Visualizer {
         let sortedWords = _.sortBy(this.wordData, [function(o) { return -o[1][0]; }]);
 
         const [words, counts] = _.unzip(sortedWords.slice(0, 30));
-        const [countsTopic1, countsTopic2] = _.unzip(counts);
+        // const [countsTopic1, countsTopic2] = _.unzip(counts);
+
+        let wordUsageColumns = [];
+
+        for (let index in counts[0]) {
+            wordUsageColumns.push(['Word usage Topic ' + index.toString()])
+        }
+
+        for (let index in counts) {
+
+            for (let index2 in counts[index]) {
+                wordUsageColumns[index2].push(counts[index][index2])
+            }
+        }
+
 
         bb.generate({
             data: {
                 columns: [
                     //TODO: capire quali sono i topic e SE SONO TOPIC E NON SENTIMENTI. STESSA COSA OVUNQUE PER NOMI COLONNE
-                    ['Word usage Topic 1', ...countsTopic1],
-                    ['Word usage Topic 2', ...countsTopic2]
+                    /*['Word usage Topic 1', ...countsTopic1],
+                    ['Word usage Topic 2', ...countsTopic2]*/
+                    ...wordUsageColumns
                 ],
                 type: "bar"
             },
@@ -90,26 +115,43 @@ export class VisualizerStacker extends Visualizer {
                     ratio: 0.8
                 }
             },
+            subchart: {
+                show: false
+            },
+
             axis: {
                 x: {
                     type: "category",
-                    categories: words
+                    categories: words,
+                    //TODO: it doesn't work, <rect> attributes all NaNs
+                    // extent: [words[1], words[5]]
+                    // extent: [1, 5]
                 }
             },
-            zoom: {
-                enabled: false
-            },
+
             bindto: "#word-usage"
         });
 
         const [linkLabels, linkValues] = _.unzip(this.linkData);
-        const [linkValuesTopic1, linkValuesTopic2] = _.unzip(linkValues);
+        // const [linkValuesTopic1, linkValuesTopic2] = _.unzip(linkValues);
+
+        let linkValuesColumns = [];
+
+        for (let index in linkValues[0]) {
+            linkValuesColumns.push(['Word usage Topic ' + index.toString()])
+        }
+
+        for (let index in linkValues) {
+
+            for (let index2 in linkValues[index]) {
+                linkValuesColumns[index2].push(linkValues[index][index2])
+            }
+        }
 
         bb.generate({
             data: {
                 columns: [
-                    ['Topic 1', ...linkValuesTopic1],
-                    ['Topic 2', ...linkValuesTopic2]
+                    ...linkValuesColumns
                 ],
                 type: "bar"
             },
@@ -130,8 +172,58 @@ export class VisualizerStacker extends Visualizer {
             bindto: "#link-bar"
         });
 
-        const h = d3.select(this.selector).select('#bubbles').node().clientHeight;
-        const w = d3.select(this.selector).select('#bubbles').node().clientWidth;
+
+
+        let retAndFavColumns =[];
+        let groups = [];
+        for (let index in this.retweets) {
+            retAndFavColumns.push(['Topic ' + index.toString()]);
+            groups.push('Topic ' + index.toString())
+        }
+
+        console.log(retAndFavColumns);
+        console.log(this.retweets[0]);
+
+        for (let index in this.retweets) {
+            retAndFavColumns[index].push(this.retweets[index]);
+            retAndFavColumns[index].push(this.likes[index]);
+        }
+
+        bb.generate({
+            data: {
+                columns: [
+                    ...retAndFavColumns,
+                ],
+                type: "bar",
+                groups: [
+                    [
+                        ...groups
+
+                    ]
+                ]
+            },
+            grid: {
+                y: {
+                    lines: [
+                        {
+                            value: 0
+                        }
+                    ]
+                }
+            },
+            axis: {
+                rotated: true,
+                x: {
+                    type: "category",
+                    categories: ['Retweets', "Favorite"]
+                }
+            },
+            bindto: "#bubbles"
+        });
+
+        /*//TODO: this or super .selector?
+        const h = d3.select(super.selector).select('#bubbles').node().clientHeight;
+        const w = d3.select(super.selector).select('#bubbles').node().clientWidth;
 
         const bubbleData = [{
             value: this.retweets,
@@ -165,6 +257,7 @@ export class VisualizerStacker extends Visualizer {
             .attr('text-anchor', 'middle')
             .attr('alignment-baseline', 'middle')
             .text(b => b.value);
+            */
     }
 
 }
