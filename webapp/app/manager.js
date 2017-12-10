@@ -30,10 +30,16 @@ export class Manager {
     }
 
     compareMultiple(names) {
-        const visualizers = names.map(n => this.getVisualizer(n));
-        this.visualizer = new VisualizerStacker(visualizers);
-        this.focusedOn = 'multiple';
-        this.visualizer.draw();
+        if (this.comparingMultiple) {
+            this.visualizer.hide();
+            this.comparingMultiple = false;
+        } else {
+            const visualizers = names.map(n => this.getVisualizer(n));
+            this.visualizer = new VisualizerStacker(visualizers);
+            this.focusedOn = 'multiple';
+            this.visualizer.draw();
+            this.compareMultiple = true;
+        }
     }
 
     hide() {
