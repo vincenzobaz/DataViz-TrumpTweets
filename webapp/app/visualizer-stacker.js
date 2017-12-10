@@ -181,8 +181,6 @@ export class VisualizerStacker extends Visualizer {
             groups.push('Topic ' + index.toString())
         }
 
-        console.log(retAndFavColumns);
-        console.log(this.retweets[0]);
 
         for (let index in this.retweets) {
             retAndFavColumns[index].push(this.retweets[index]);
