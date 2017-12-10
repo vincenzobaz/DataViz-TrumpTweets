@@ -71,6 +71,11 @@ export class Bubbles {
             this.removeForcesFromBubble(d3.event.subject);
             // Add bubble to list of selected
             this.selectedBubbles = [..._.get(this, 'selectedBubbles', []), d3.event.subject];
+            this.selectedBubbles.forEach(b => {
+                b.r = this.dimensionsCollapsed[0] / 2;
+                b.x = this.dimensionsCollapsed[0] / 2
+            });
+            this.draw();
             this.addMultipleSelectionButtons();
             this.collapse(this.selectedBubbles);
         }
@@ -194,11 +199,17 @@ export class Bubbles {
             .attr('type', 'button')
             .attr('class', 'btn btn-success btn-block')
             .html('Compare')
-            .on('click', () => this.compareMultiple(this.selectedBubbles.map(b => b.data.text)));
+            .on('click', () => {
+                const selectedNames = this.selectedBubbles.map(b => b.data.text);
+                this.notDrawing = new Set(this.bubbles.filter(b => !selectedNames.includes(b.data.text)).map(b => b.data.text));
+                this.compareMultiple(selectedNames);
+            });
 
         const emptySelection = () => {
             this.simulation.nodes([...this.simulation.nodes(), ...this.selectedBubbles]);
             this.selectedBubbles = [];
+            this.notDrawing = null;
+            this.compareMultiple([]);
         };
 
         div.append('button')
@@ -235,6 +246,7 @@ export class Bubbles {
         const color = d3.scaleOrdinal(d3.schemeCategory10);
 
         this.bubbles.forEach(b => {
+            if (this.notDrawing && this.notDrawing.has(b.data.text)) return;
             ctx.beginPath();
             ctx.moveTo(b.x + b.r, b.y);
             ctx.arc(b.x, b.y, b.r, 0, 2 * Math.PI);
