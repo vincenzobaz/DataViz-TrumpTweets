@@ -22,20 +22,13 @@ export class VisualizerStacker extends Visualizer {
             wordData = mergeConcat(wordData, _.fromPairs(v.wordData));
             linkData = mergeConcat(linkData, prepareForMerge(v, 'linkData'));
             timeData = mergeConcat(timeData, prepareForMerge(v, 'timeSeriesData'));
-            console.log(timeData);
         }
 
         // Format: [[word/linkword/date, [count1, count2...]]]
-        // lista di liste: ogni lista interna contiene la parola come primo elemento e il valore per ogni bubble
         this.wordData = unzipAndFilter(wordData);
-        // link data: se sono in topic -> sentimenti del topic
-        // sentimenti mi manda -> topic
         this.linkData = unzipAndFilter(linkData);
-        // plot sovrapposti per l'usage in time
         this.timeData = unzipAndFilter(timeData);
-
-        // Fare barchart per il momento
-        // VEDI LODASH per gestire i dati/sortare ecc.
+        this.timeData.forEach(dateToCounts => dateToCounts[0] = new Date(dateToCounts[0]));
 
         // Format: [retweetsTweet]
         this.retweets = visualizers.map(v => v.retweets);
@@ -47,28 +40,10 @@ export class VisualizerStacker extends Visualizer {
         if (!this.divExists) {
             this.createDivs();
         }
-        console.log(this.timeData);
 
-        const [dates, usage] = _.unzip(this.timeData);
-
-        let usageTopic1 = [];
-        let usageTopic2 = [];
-
-        for (let element in usage) {
-            if (usage[element][0] != undefined) {
-                usageTopic1.push(usage[element][0]);
-            }
-            else {
-                usageTopic1.push(0);
-            }
-
-            if (usage[element][1] != undefined) {
-                usageTopic2.push(usage[element][1]);
-            }
-            else {
-                usageTopic2.push(0);
-            }
-        }
+        let [dates, usage] = _.unzip(this.timeData);
+        usage = usage.map(counts => counts.map(c => c != undefined ? c : 0));
+        const [usageTopic1, usageTopic2] = _.unzip(usage);
 
         bb.generate({
             data: {
@@ -99,14 +74,7 @@ export class VisualizerStacker extends Visualizer {
         let sortedWords = _.sortBy(this.wordData, [function(o) { return -o[1][0]; }]);
 
         const [words, counts] = _.unzip(sortedWords.slice(0, 30));
-
-        let countsTopic1 = [];
-        let countsTopic2 = [];
-
-        for (let element in counts) {
-            countsTopic1.push(counts[element][0]);
-            countsTopic2.push(counts[element][1]);
-        }
+        const [countsTopic1, countsTopic2] = _.unzip(counts);
 
         bb.generate({
             data: {
@@ -135,16 +103,8 @@ export class VisualizerStacker extends Visualizer {
         });
 
         const [linkLabels, linkValues] = _.unzip(this.linkData);
+        const [linkValuesTopic1, linkValuesTopic2] = _.unzip(linkValues);
 
-        let linkValuesTopic1 = [];
-        let linkValuesTopic2 = [];
-
-        for (let element in linkValues) {
-            linkValuesTopic1.push(linkValues[element][0]);
-            linkValuesTopic2.push(linkValues[element][1]);
-        }
-
-        console.log(linkValuesTopic1);
         bb.generate({
             data: {
                 columns: [
@@ -173,7 +133,6 @@ export class VisualizerStacker extends Visualizer {
         const h = d3.select(this.selector).select('#bubbles').node().clientHeight;
         const w = d3.select(this.selector).select('#bubbles').node().clientWidth;
 
-        console.log(this.retweets);
         const bubbleData = [{
             value: this.retweets,
             x: w / 2 - h,
