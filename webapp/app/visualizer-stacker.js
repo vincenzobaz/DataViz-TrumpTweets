@@ -34,6 +34,7 @@ export class VisualizerStacker extends Visualizer {
         this.retweets = visualizers.map(v => v.retweets);
         // Format: [likesTweet]
         this.likes = visualizers.map(v => v.likes);
+        this.names = visualizers.map(v => _.capitalize(v.name));
     }
 
     draw() {
@@ -47,7 +48,7 @@ export class VisualizerStacker extends Visualizer {
         let usageColumns = [];
 
         for (let index in usage[0]) {
-            usageColumns.push(['Usage Topic ' + index.toString()])
+            usageColumns.push(['Usage of ' + this.names[index]])
         }
 
         for (let index in usage) {
@@ -89,7 +90,7 @@ export class VisualizerStacker extends Visualizer {
         let wordUsageColumns = [];
 
         for (let index in counts[0]) {
-            wordUsageColumns.push(['Word usage Topic ' + index.toString()])
+            wordUsageColumns.push(['Word usage of ' + this.names[index]])
         }
 
         for (let index in counts) {
@@ -177,8 +178,8 @@ export class VisualizerStacker extends Visualizer {
         let retAndFavColumns =[];
         let groups = [];
         for (let index in this.retweets) {
-            retAndFavColumns.push(['Topic ' + index.toString()]);
-            groups.push('Topic ' + index.toString())
+            retAndFavColumns.push([this.names[index]]);
+            groups.push(this.names[index])
         }
 
 

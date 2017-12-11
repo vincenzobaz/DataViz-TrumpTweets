@@ -27,5 +27,6 @@ export class TopicVisualizer extends Visualizer {
         this.likes = stats.getLikeCount(tweets);
         this.retweets = stats.getRetweetCount(tweets);
         this.wordData = stats.getWordUsage(tweets);
+        this.name = topic;
     }
 }

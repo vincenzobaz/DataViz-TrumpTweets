@@ -141,9 +141,8 @@ export class Visualizer {
 
     hide() {
         if (this.divExists) {
-            d3.select(this.selector)
-                .select('.stats')
-                .remove();
+            d3.select('.stats')
+              .remove();
             //.transition()
             //.style('opacity', 0) // Crashes :()
             //.duration(0)

@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import * as _ from 'lodash';
+import { textToImage } from './imagemap';
 
 export class Bubbles {
     constructor(selector, bubbles, dimensionsFull, dimensionsCollapsed, compareMultiple, animTime = 500) {
@@ -89,6 +90,7 @@ export class Bubbles {
 
     startSimulation() {
         if (this.simulationRunning) return;
+        this.bubbles.forEach(b => b.r = b.packedR);//this.reset();
         this.simulation.force('collide', d3.forceCollide(b => b.r + 5).iterations(5))
             .force('xf', d3.forceX(b => b.packedX).strength(1))
             .force('yf', d3.forceY(b => b.packedY).strength(1))
@@ -143,15 +145,19 @@ export class Bubbles {
         this.selectedBubbles = [];
     }
 
+    resetView() {
+        this.collapsed = false;
+        this.selectedBubble = null;
+        this.bubbles.forEach(b => b.r = b.packedR);//this.reset();
+        this.deleteColllapseForces();
+        this.simulation.nodes(this.bubbles);
+        this.startSimulation();
+    }
+
     callback(layout_bubble) {
         // Click on already selected => reset
         if (this.selectedBubble && layout_bubble.data.text === this.selectedBubble) {
-            this.collapsed = false;
-            this.selectedBubble = null;
-            this.bubbles.forEach(b => b.r = b.packedR);//this.reset();
-            this.deleteColllapseForces();
-            this.simulation.nodes(this.bubbles);
-            this.startSimulation();
+            this.resetView();
         } else { // Otherwise select new bubble and redraw
             this.collapsed = true;
             this.selectedBubble = layout_bubble.data.text;
@@ -202,6 +208,8 @@ export class Bubbles {
             .on('click', () => {
                 const selectedNames = this.selectedBubbles.map(b => b.data.text);
                 this.notDrawing = new Set(this.bubbles.filter(b => !selectedNames.includes(b.data.text)).map(b => b.data.text));
+                this.collapsed = true;
+                this.stopSimulation();
                 this.compareMultiple(selectedNames);
             });
 
@@ -210,6 +218,7 @@ export class Bubbles {
             this.selectedBubbles = [];
             this.notDrawing = null;
             this.compareMultiple([]);
+            this.resetView()
         };
 
         div.append('button')
@@ -247,6 +256,7 @@ export class Bubbles {
 
         this.bubbles.forEach(b => {
             if (this.notDrawing && this.notDrawing.has(b.data.text)) return;
+            //ctx.globalCompositeOperation = 'destination-in';
             ctx.beginPath();
             ctx.moveTo(b.x + b.r, b.y);
             ctx.arc(b.x, b.y, b.r, 0, 2 * Math.PI);
@@ -257,7 +267,9 @@ export class Bubbles {
 
             ctx.fillStyle = 'black';
             ctx.textAlign = 'center';
+            ctx.drawImage(textToImage(b.prettyText), b.x - b.r, b.y - b.r, b.r * 2, b.r * 2);
             ctx.fillText(b.prettyText, b.x, b.y);
+            ctx.globalCompositeOperation = 'source-over';
             ctx.closePath();
         });
     }

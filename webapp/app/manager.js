@@ -25,21 +25,8 @@ export class Manager {
                 .append('div')
                 .attr('id', this.id);
         }
-        const bubblePlot = new Bubbles('#' + this.id, this.bubbles, [contentWidth, contentHeight], [flattenedBubblesWidth, contentHeight], this.compareMultiple.bind(this))
+        const bubblePlot = new Bubbles('#' + this.id, this.bubbles, [contentWidth, contentHeight], [flattenedBubblesWidth, contentHeight], this.focusOn.bind(this))
         bubblePlot.draw();
-    }
-
-    compareMultiple(names) {
-        if (this.comparingMultiple) {
-            this.visualizer.hide();
-            this.comparingMultiple = false;
-        } else {
-            const visualizers = names.map(n => this.getVisualizer(n));
-            this.visualizer = new VisualizerStacker(visualizers);
-            this.focusedOn = 'multiple';
-            this.visualizer.draw();
-            this.compareMultiple = true;
-        }
     }
 
     hide() {
@@ -52,15 +39,28 @@ export class Manager {
 
     focusOn(newFocus) {
         // Nothing is selected, create viz
-        if (this.focusedOn == newFocus) {
-            this.visualizer.hide();
-            this.visualizer = null;
-            this.focusedOn = null;
+        if (Array.isArray(newFocus)) {
+            if (newFocus.length > 0) {
+                if (this.focusedOn) this.visualizer.hide();
+                this.visualizer = new VisualizerStacker(newFocus.map(n => this.getVisualizer(n)));
+                this.visualizer.draw();
+                this.focusedOn = 'multiple';
+            } else {
+                this.visualizer.hide();
+                this.visualizer = null;
+                this.focusedOn = null;
+            }
         } else {
-            if (this.focusedOn) this.visualizer.hide();
-            this.visualizer = this.getVisualizer(newFocus);
-            this.visualizer.draw();
-            this.focusedOn = newFocus;
+            if (this.focusedOn == newFocus) {
+                this.visualizer.hide();
+                this.visualizer = null;
+                this.focusedOn = null;
+            } else {
+                if (this.focusedOn) this.visualizer.hide();
+                this.visualizer = this.getVisualizer(newFocus);
+                this.visualizer.draw();
+                this.focusedOn = newFocus;
+            }
         }
     }
 

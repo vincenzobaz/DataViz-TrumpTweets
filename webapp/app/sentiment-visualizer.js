@@ -23,5 +23,6 @@ export class SentimentVisualizer extends Visualizer {
         this.likes = stats.getLikeCount(predominantTweets);
         this.retweets = stats.getRetweetCount(predominantTweets);
         this.wordData = stats.getWordUsage(predominantTweets);
+        this.name = sentiment;
     }
 }
