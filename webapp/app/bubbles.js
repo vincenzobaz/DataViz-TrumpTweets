@@ -267,7 +267,8 @@ export class Bubbles {
 
             ctx.fillStyle = 'black';
             ctx.textAlign = 'center';
-            ctx.drawImage(textToImage(b.prettyText), b.x - b.r, b.y - b.r, b.r * 2, b.r * 2);
+            // ctx.drawImage(textToImage(b.prettyText), b.x - b.r, b.y - b.r, b.r * 2, b.r * 2);
+            ctx.drawImage(textToImage(b.prettyText), b.x - b.r, b.y - b.r, b.r*2, b.r*2);
             ctx.fillText(b.prettyText, b.x, b.y);
             ctx.globalCompositeOperation = 'source-over';
             ctx.closePath();
