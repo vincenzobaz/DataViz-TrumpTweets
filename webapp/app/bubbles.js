@@ -90,7 +90,11 @@ export class Bubbles {
 
     startSimulation() {
         if (this.simulationRunning) return;
-        this.bubbles.forEach(b => b.r = b.packedR);//this.reset();
+        this.bubbles.forEach(b => {
+            b.r = b.packedR;
+            b.x = b.packedX;
+            b.y = b.packedY;
+        });
         this.simulation.force('collide', d3.forceCollide(b => b.r + 5).iterations(5))
             .force('xf', d3.forceX(b => b.packedX).strength(1))
             .force('yf', d3.forceY(b => b.packedY).strength(1))
