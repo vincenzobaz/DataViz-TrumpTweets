@@ -12,7 +12,7 @@ const getImage = name => {
         return cache[name];
     } */
     const img = new Image();
-    img.src = serverUrl + '/' + map[name];
+    img.src = serverUrl + map[name];
     cache[name] = img;
     return img;
 };
@@ -28,7 +28,7 @@ const map = {
     'Trust': 'sentiments/trust.png',
     'Surprise': 'sentiments/surprise.png',
     'Internal politics': 'topics/internal politics.png',
-    'Hillary': 'topics/Hllary.png',
+    'Hillary': 'topics/hillary.png',
     'Obama': 'topics/obama.png',
     'China': 'topics/china.png',
     'Business': 'topics/business.png',
