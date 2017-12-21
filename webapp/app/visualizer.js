@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import * as _ from 'lodash';
 import { bb } from 'billboard.js';
-let i = 0;
+
 export class Visualizer {
     constructor(selector, animTime = 500) {
         this.selector = '#' + selector;
@@ -16,7 +16,7 @@ export class Visualizer {
             .attr('class', 'stats')
             .style('opacity', 0);
 
-        let divs = ['timeseries', 'word-usage', 'link-bar', 'bubbles'].map(id => bigBox.append('div').attr('id', id))
+        let divs = ['timeseries', 'word-usage', 'link-bar', 'bubbles'].map(id => bigBox.append('div').attr('id', id));
         divs = [bigBox, ...divs];
         divs.forEach(div => div.transition().style('opacity', 1).delay(this.animTime).duration(this.animTime));
         this.divExists = true;
@@ -72,7 +72,7 @@ export class Visualizer {
                 }
             },
             zoom: {
-                enabled: true
+                enabled: false
             },
             bindto: "#word-usage"
         });
@@ -97,7 +97,7 @@ export class Visualizer {
                 }
             },
             zoom: {
-                enabled: true
+                enabled: false
             },
             bindto: "#link-bar"
         });
@@ -131,7 +131,7 @@ export class Visualizer {
             .attr('height', h)
             .attr('xlink:href', d => d.img)
 
-       startSelector.append('text')
+        startSelector.append('text')
             .attr('y', h / 2)
             .attr('x', h / 2)
             .attr('text-anchor', 'middle')
@@ -140,14 +140,8 @@ export class Visualizer {
     }
 
     hide() {
-        if (this.divExists) {
-            d3.select(this.selector)
-                .select('.stats')
-                .remove();
-            //.transition()
-            //.style('opacity', 0) // Crashes :()
-            //.duration(0)
-            this.divExists = false;
-        }
+        d3.select('.stats')
+          .remove();
+
     }
 }

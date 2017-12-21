@@ -8,7 +8,7 @@ const stopwords = ['.', ',', '?', '!', '\'', '"', ':', ';', '...', '-', '@',
     'not', 'so', 'more', 'about', 'what', 'all', 'get', 'but', 'one',
     'over', 'their', 'why', 'when', 'what', 'them', 'who', 'said', 'out',
     'would', 'had', 'can', 'should', 'would', 'do', 'been', 'an', 'cont', 'dont',
-    '1','2','3','4','5','6','7','8','9', 'http', 'https', 'how', 'ing', 'gre'];
+    '1','2','3','4','5','6','7','8','9', 'http', 'https', 'how', 'ing', 'gre', 'dont', 'cont'];
 
 function breakText(text) {
     const noPunct = stopwords.reduce((acc, mark) => acc.replace(mark, ' '), _.lowerCase(text));
@@ -16,11 +16,11 @@ function breakText(text) {
 }
 
 export function getRetweetCount(tweets) {
-    return _.sumBy(tweets, 'retweet_count')/tweets.length;
+    return Math.round(_.sumBy(tweets, 'retweet_count')/tweets.length);
 }
 
 export function getLikeCount(tweets) {
-    return _.sumBy(tweets, 'favorite_count')/tweets.length;
+    return Math.round(_.sumBy(tweets, 'favorite_count')/tweets.length);
 }
 
 export function getWordUsage(tweets, getCoefficient = t => 1) {

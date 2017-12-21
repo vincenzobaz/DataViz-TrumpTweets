@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import { Bubbles } from './bubbles';
+import { VisualizerStacker } from './visualizer-stacker';
 
 
 export class Manager {
@@ -24,8 +25,8 @@ export class Manager {
                 .append('div')
                 .attr('id', this.id);
         }
-        const bubblePlot = new Bubbles('#' + this.id, this.bubbles, [contentWidth, contentHeight], [flattenedBubblesWidth, contentHeight])
-        bubblePlot.drawFull();
+        const bubblePlot = new Bubbles('#' + this.id, this.bubbles, [contentWidth, contentHeight], [flattenedBubblesWidth, contentHeight], this.focusOn.bind(this))
+        bubblePlot.draw();
     }
 
     hide() {
@@ -38,14 +39,30 @@ export class Manager {
 
     focusOn(newFocus) {
         // Nothing is selected, create viz
-        if (this.focusedOn == newFocus) {
-            this.visualizer.hide();
-            this.focusedOn = null;
+        if (Array.isArray(newFocus)) {
+            if (newFocus.length > 0) {
+                if (this.focusedOn) this.visualizer.hide();
+                this.visualizer = new VisualizerStacker(newFocus.map(n => this.getVisualizer(n)));
+                this.visualizer.draw();
+                this.focusedOn = 'multiple';
+            } else {
+                this.visualizer && this.visualizer.hide();
+                this.visualizer = null;
+                this.focusedOn = null;
+                this.hide();
+                this.draw();
+            }
         } else {
-            if (this.focusedOn) this.visualizer.hide();
-            this.visualizer = this.getVisualizer(newFocus);
-            this.visualizer.draw();
-            this.focusedOn = newFocus;
+            if (this.focusedOn == newFocus) {
+                this.visualizer.hide();
+                this.visualizer = null;
+                this.focusedOn = null;
+            } else {
+                if (this.focusedOn) this.visualizer.hide();
+                this.visualizer = this.getVisualizer(newFocus);
+                this.visualizer.draw();
+                this.focusedOn = newFocus;
+            }
         }
     }
 

@@ -19,5 +19,4 @@ export class TopicsManager extends Manager {
     getVisualizer(topic) {
         return new TopicVisualizer('topics-content', this.tweetsByTopic[topic])
     }
-
 }

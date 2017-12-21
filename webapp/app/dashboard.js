@@ -45,5 +45,4 @@ class Dashboard {
 
 export function dashboard(data) {
     const dashboard = new Dashboard(data)
-    // TODO: separate sentiment and topic dataj
 }

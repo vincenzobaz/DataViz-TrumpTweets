@@ -43,5 +43,4 @@ export class SentimentsManager extends Manager {
             this.tweetsWith(sentiment)
         );
     }
-
 }
