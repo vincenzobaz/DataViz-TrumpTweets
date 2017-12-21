@@ -139,7 +139,7 @@ export class VisualizerStacker extends Visualizer {
         let linkValuesColumns = [];
 
         for (let index in linkValues[0]) {
-            linkValuesColumns.push(['Word usage Topic ' + index.toString()])
+            linkValuesColumns.push(['Emotions levels of ' + this.names[index]])
         }
 
         for (let index in linkValues) {

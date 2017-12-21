@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<title>W3.CSS Template</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb"
+      crossorigin="anonymous">
+<link rel="stylesheet" type="text/css" href="main.css">
+<link rel="stylesheet" type="text/css" href="billboard.css">
+<style>
+    body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
+    .w3-bar,h1,button {font-family: "Montserrat", sans-serif}
+    .fa-anchor,.fa-coffee {font-size:200px}
+</style>
+<body>
+
+<!-- Navbar -->
+<div class="w3-top">
+    <div class="w3-bar w3-blue w3-card w3-left-align w3-large">
+        <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-red" href="javascript:void(0);" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
+        <a href="#" class="w3-bar-item w3-button w3-padding-large w3-white">Home</a>
+    </div>
+
+    <!-- Navbar on small screens -->
+    <div id="navDemo" class="w3-bar-block w3-white w3-hide w3-hide-large w3-hide-medium w3-large">
+    </div>
+</div>
+
+<!-- Header -->
+<header class="w3-container w3-blue w3-center" style="padding:128px 16px">
+    <h1 class="w3-margin w3-jumbo">Visualizing Trump Tweets</h1>
+    <h2>EPFL COM-480 - Data Visualization Project</h2>
+    <h3>Vincenzo Bazzucchi, Christian Sciuto, Lorenzo Tarantino</h3>
+    <a href="https://docs.google.com/document/d/17qCbv6ac8XR5JAcMS2A6HRuT_q_F6QNxCck1K2O9qkY/edit?usp=sharing">Process book</a><br>
+</header>
+
+<!-- First Grid -->
+<div class="w3-row-padding w3-padding-64 w3-container">
+    <div class="w3-content">
+        <div id="intro" class="w3-twothird">
+            <h1>What are you going to see?</h1>
+            <p>
+                As everyone nowadays knows, the new President of the United States Donald Trump uses Twitter as his main
+                communication channel with all US citizens (and not only them). He tweets about every contemporary topic and every
+                issue and he can reach an huge amount of people, thanks to his political and financial position, but also thanks
+                to his speaking/writing abilities.
+            </p>
+            <p>
+                We are interested in studying and analyzing the format, contents and emotions contained (and sometimes hidden
+                behind what he writes) in his tweets. Since these tweets reach almost everyone that has a Twitter account, it
+                seemed legit to us to go deeper in the their meaning and expressions, trying to find patterns, different and common
+                usages in some of the most used topics touched by Trump.
+            </p>
+            <p>
+                From the 33k and more tweets that Trump ever made since 2009, we extracted only the ones that refer to nine different
+                topics:<br>
+                <!--<ul>
+                  <li>Internal Politics</li>
+                  <li>Obama</li>
+                  <li>Hillary Clinton</li>
+                  <li>Foreign Politics</li>
+                  <li>China</li>
+                  <li>Business</li>
+                  <li>Shows</li>
+                  <li>Interviews and Debates</li>
+                  <li>Various</li>
+                </ul>-->
+                Internal Politics <br> Obama <br> Hillary Clinton <br> Foreign Politics <br> China <br> Business <br> Shows <br>
+                Interviews and Debates <br> Various
+
+            </p>
+            <p>
+                For every topic we studied the usage during the time, the most used words, and the number of retweets and
+                favorites.
+                We wanted to add a sentiment analysis on every tweet that we studied and we did it. Thanks to the
+                <a href="http://saifmohammad.com/WebPages/NRC-Emotion-Lexicon.htm">datasets</a>
+                offered by National Research Council Canada, we were able to build an overview of the emotions transmitted behind
+                what Trump wrote.
+            </p>
+            <h1>How is the visualization structured?</h1>
+            <p>
+                After clicking the button start, two buttons will be showed: "topics" and "sentiment". Clicking on one of them
+                will show bubbles referring to different topics/sentiments depending on what you previously chose. For instance,
+                if you click on "topics", all the topics above listed will be displayed, one bubble for each of them. Every bubble
+                has a different size, depending on how many tweets are contained in that particular topic.
+            </p>
+            <p>
+                Once you can see all the bubbles, you can just click on one and see all the statistics explained above. If you are
+                curious to compare different topics or different sentiments, you can drop two of them in the left layer and see
+                the differences between the two compared objects.
+            </p>
+            <p>
+                OK! Now you are ready to start. Don't be shy and click the button!
+            </p>
+
+            <button type="button" class="btn btn-primary btn-lg" id="start-button">Start!</button>
+        </div>
+
+        <div class="w3-third w3-center">
+            <img src="trump.png" alt="President Trump">
+            <!--<i class="fa fa-anchor w3-padding-64 w3-text-red"></i>-->
+        </div>
+    </div>
+</div>
+
+<!-- Second Grid -->
+<div class="w3-row-padding w3-light-grey w3-padding-64 w3-container">
+    <div class="w3-content">
+        <div class="w3-third w3-center">
+            <img src="data.png" alt="Data" style="width:450px;height:500px;">
+        </div>
+
+        <h1>Considerations</h1>
+        <h2>Tweets Usage</h2>
+        <p>
+            We can find some interesting considerations from the tweets usage. <br>
+            Since the start of his campaign, we can see a strong decrease of tweets concerning business (almost 0). Clearly,
+            his first goal was politics and not business anymore. On the other hand, from 2015 Trump's interest in Foreign
+            Politics increased. Following the same trend, we can observe that tweets concerning Internal Politics are mostly
+            concentrated in the period of the Campaign and Presidency.<br>
+            There are a lot of tweets regarding Obama in 2012 (when he was reelected), and some outliers during 2014.<br>
+            We have two peaks for the shows and they both are in between two years (December 2012 and January 2013 and the
+            same for 2014/2015). We can link this behavior with the confirmation from NBC of the new seasons of the show
+            produced and presented by Donald Trump, Celebrity Apprentice.
+        </p>
+        <h2>Word Usage</h2>
+        <p>
+            Words usage for what concerns topics is not really interesting, we can see that the most used words are the ones
+            that reflect the meaning of the topic.<br>
+            TO BE CONTINUED...
+        </p>
+        <h2>Sentiments</h2>
+        <p>
+            We can see that generally Trump have more positive tweets than negative, he needs people to like him for his
+            business and for his politics. More specifically we can find a confirm of this fact looking at the sentiments in
+            Business, Shows and Interviews. Of course, when he speaks about his business, he has to be positive: we can see an
+            high level of trust in his tweets. For what concerns shows, we can state very similar considerations: he produces
+            and leads a tv show called 'Celebrity Apprentice' and he often tweets about it. He needs to transmit positive
+            vibes to convince people that his show is worth watching. A very similar pattern for similar reason is found in
+            the interviews and debate topic.
+            For what concerns politics we have different trends: there are high level of anger and fear, with an high level of
+            trust, in every topic concerning politics except for Obama, that is a little different. When it comes to politics
+            he generally have slightly more negative tweets than positive. The interesting thing is that his level of trust is
+            always the highest in every topic compared to the other emotions as we expected, except when he talks about
+            Hillary Clinton or Barack Obama.
+            About the Clinton's topic, the highest emotions are anger, fear, disgust and sadness in this order. Not that it's
+            not something that we were not expecting, but the fact that the trust level is lower than four other negative
+            emotions it's very relevant.
+            In the Obama's topic positive and negative emotions are almost at the same level, even if sadness is the highest
+            emotion we can find. Levels of trust are second, so differently from Clinton topic, his more trustful when he
+            speaks about Obama than Clinton.
+            Note that the levels of joy are often low compared to the other emotions, except for shows and business.
+        </p>
+        <h2>Retweets and Favorite count</h2>
+        <p>
+            We can clearly see that the number of retweets and favorites are way higher when they are about Hillary Clinton.
+            These tweets are from 2016 and 2017, so as we know, during the election campaign Trump's tweets reached a very
+            high popularity.<br>
+            Except for Hillary, the other topics have similar trends of retweets and favorite counts. Anyway, we can note that
+            Internal Politics has higher values than every other topic (that is because it also contains tweets concerning
+            Hillary) and also that people are generally more interested in Foreign Politics and Interviews-Debates. <br>
+            Looking at the interest of the public and at the sentiment categories, the most "loved" tweets are the ones were
+            Fear predominates. The three following sentiments most retweeted and liked are Anger, Disgust and Anticipation.
+            It's interesting to see how tweets with a negative connotation are generally more followed by Trump's public than
+            the ones with a positive connotation.
+        </p>
+    </div>
+</div>
+
+<div class="w3-container w3-black w3-center w3-opacity w3-padding-64">
+    <h1 class="w3-margin w3-xlarge">Thanks for your attention!</h1>
+</div>
+
+
+<script>
+    // Used to toggle the menu on small screens when clicking on the menu button
+    function myFunction() {
+        var x = document.getElementById("navDemo");
+        if (x.className.indexOf("w3-show") == -1) {
+            x.className += " w3-show";
+        } else {
+            x.className = x.className.replace(" w3-show", "");
+        }
+    }
+</script>
+
+</body>
+</html>
+
