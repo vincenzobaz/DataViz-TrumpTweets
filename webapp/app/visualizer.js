@@ -141,8 +141,7 @@ export class Visualizer {
 
     hide() {
         d3.select('.stats')
-            .remove();
+          .remove();
 
-        this.divExists = false;
     }
 }

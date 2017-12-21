@@ -49,6 +49,8 @@ export class Manager {
                 this.visualizer && this.visualizer.hide();
                 this.visualizer = null;
                 this.focusedOn = null;
+                this.hide();
+                this.draw();
             }
         } else {
             if (this.focusedOn == newFocus) {
