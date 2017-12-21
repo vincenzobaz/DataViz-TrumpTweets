@@ -33,7 +33,7 @@ const map = {
     'China': 'topics/china.png',
     'Business': 'topics/business.png',
     'Various': 'topics/various.png',
-    'Interview debates': 'topics/various.png',
+    'Interviews debates': 'topics/interviews.png',
     'Foreign politics': 'topics/foreign politics.png',
     'Shows': 'topics/shows.png'
 };
