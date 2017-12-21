@@ -41,7 +41,6 @@ export class Bubbles {
         // and its 2d Context
         this.context = this.canvas.node().getContext('2d');
         // Create physics simulator
-        this.simulation = d3.forceSimulation(this.bubbles);
         this.startSimulation();
 
         this.drawnButtons = false;
@@ -90,7 +89,8 @@ export class Bubbles {
 
     startSimulation() {
         if (this.simulationRunning) return;
-        this.bubbles.forEach(b => b.r = b.packedR);//this.reset();
+        this.simulation = d3.forceSimulation(this.bubbles);
+        //this.bubbles.forEach(b => b.r = b.packedR)
         this.simulation.force('collide', d3.forceCollide(b => b.r + 5).iterations(5))
             .force('xf', d3.forceX(b => b.packedX).strength(1))
             .force('yf', d3.forceY(b => b.packedY).strength(1))
@@ -136,19 +136,13 @@ export class Bubbles {
         this.simulationRunning = false;
     }
 
-    reset() {
-        this.bubbles.forEach(b => {
-            b.x = b.packedX;
-            b.y = b.packedY;
-            b.r = b.packedR;
-        });
-        this.selectedBubbles = [];
-    }
-
     resetView() {
         this.collapsed = false;
         this.selectedBubble = null;
-        this.bubbles.forEach(b => b.r = b.packedR);//this.reset();
+        this.selectedBubbles = [];
+        this.bubbles.forEach(b => {
+            b.r = b.packedR;
+        });//this.reset();
         this.deleteColllapseForces();
         this.simulation.nodes(this.bubbles);
         this.startSimulation();
@@ -196,7 +190,15 @@ export class Bubbles {
     }
 
     addMultipleSelectionButtons() {
-        if (this.drawnButtons) return;
+        if (this.drawnButtons) {
+            if (this.selectedBubbles && this.selectedBubbles.length == 2) {
+                d3.select(this.selector)
+                  .select('#selection-buttons')
+                  .select('.btn-success')
+                  .node().disabled = false;
+            }
+            return;
+        }
         const div = d3.select(this.selector)
             .append('div')
             .attr('id', 'selection-buttons');
@@ -205,6 +207,7 @@ export class Bubbles {
             .attr('type', 'button')
             .attr('class', 'btn btn-success btn-block')
             .html('Compare')
+            .attr('disabled', true)
             .on('click', () => {
                 const selectedNames = this.selectedBubbles.map(b => b.data.text);
                 this.notDrawing = new Set(this.bubbles.filter(b => !selectedNames.includes(b.data.text)).map(b => b.data.text));
@@ -214,7 +217,8 @@ export class Bubbles {
             });
 
         const emptySelection = () => {
-            this.simulation.nodes([...this.simulation.nodes(), ...this.selectedBubbles]);
+            this.simulation.nodes(this.bubbles);//[...this.simulation.nodes(), ...this.selectedBubbles]);
+            this.bubbles.forEach(b => b.r = b.packedR);
             this.selectedBubbles = [];
             this.notDrawing = null;
             this.compareMultiple([]);
