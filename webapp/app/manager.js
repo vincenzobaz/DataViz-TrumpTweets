@@ -46,7 +46,7 @@ export class Manager {
                 this.visualizer.draw();
                 this.focusedOn = 'multiple';
             } else {
-                this.visualizer.hide();
+                this.visualizer && this.visualizer.hide();
                 this.visualizer = null;
                 this.focusedOn = null;
             }

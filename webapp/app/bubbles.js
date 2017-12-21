@@ -193,9 +193,9 @@ export class Bubbles {
         if (this.drawnButtons) {
             if (this.selectedBubbles && this.selectedBubbles.length == 2) {
                 d3.select(this.selector)
-                  .select('#selection-buttons')
-                  .select('.btn-success')
-                  .node().disabled = false;
+                    .select('#selection-buttons')
+                    .select('.btn-success')
+                    .node().disabled = false;
             }
             return;
         }
@@ -216,20 +216,17 @@ export class Bubbles {
                 this.compareMultiple(selectedNames);
             });
 
-        const emptySelection = () => {
-            this.simulation.nodes(this.bubbles);//[...this.simulation.nodes(), ...this.selectedBubbles]);
-            this.bubbles.forEach(b => b.r = b.packedR);
-            this.selectedBubbles = [];
-            this.notDrawing = null;
-            this.compareMultiple([]);
-            this.resetView()
-        };
-
         div.append('button')
             .attr('type', 'button')
             .attr('class', 'btn btn-danger btn-block')
             .html('Reset')
-            .on('click', emptySelection);
+            .on('click', () => {
+                this.selectedBubbles = null;
+                this.notDrawing = null;
+                this.compareMultiple([]);
+                this.resetView()
+            }
+            );
         this.drawnButtons = true;
     }
 
@@ -256,23 +253,20 @@ export class Bubbles {
             ctx.closePath();
         }
 
-        const color = d3.scaleOrdinal(d3.schemeCategory10);
 
         this.bubbles.forEach(b => {
             if (this.notDrawing && this.notDrawing.has(b.data.text)) return;
-            //ctx.globalCompositeOperation = 'destination-in';
             ctx.beginPath();
             ctx.moveTo(b.x + b.r, b.y);
             ctx.arc(b.x, b.y, b.r, 0, 2 * Math.PI);
-            ctx.fillStyle = color(b.data.size);
-            ctx.fill();
+            //ctx.fill();
             ctx.strokeStyle = '#fff';
             ctx.stroke();
 
             ctx.fillStyle = 'black';
             ctx.textAlign = 'center';
             // ctx.drawImage(textToImage(b.prettyText), b.x - b.r, b.y - b.r, b.r * 2, b.r * 2);
-            ctx.drawImage(textToImage(b.prettyText), b.x - b.r, b.y - b.r, b.r*2, b.r*2);
+            ctx.drawImage(textToImage(b.prettyText), b.x - b.r, b.y - b.r, b.r * 2, b.r * 2);
             ctx.fillText(b.prettyText, b.x, b.y);
             ctx.globalCompositeOperation = 'source-over';
             ctx.closePath();

@@ -131,7 +131,7 @@ export class Visualizer {
             .attr('height', h)
             .attr('xlink:href', d => d.img)
 
-       startSelector.append('text')
+        startSelector.append('text')
             .attr('y', h / 2)
             .attr('x', h / 2)
             .attr('text-anchor', 'middle')
@@ -140,13 +140,9 @@ export class Visualizer {
     }
 
     hide() {
-        if (this.divExists) {
-            d3.select('.stats')
-              .remove();
-            //.transition()
-            //.style('opacity', 0) // Crashes :()
-            //.duration(0)
-            this.divExists = false;
-        }
+        d3.select('.stats')
+            .remove();
+
+        this.divExists = false;
     }
 }
