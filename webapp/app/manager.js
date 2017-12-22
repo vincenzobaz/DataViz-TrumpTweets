@@ -71,11 +71,10 @@ export class Manager {
                 this.focusedOn = null;
             } else { // New name => refocus
                 if (this.focusedOn) this.visualizer.hide();
-                this.visualizer = this.getVisualizer(newFocus);
+                this.visualizer = this.getVisualizer(newFocus); // Obtain specialized visualizer, method defined in subclasses
                 this.visualizer.draw();
                 this.focusedOn = newFocus;
             }
         }
     }
-
 }

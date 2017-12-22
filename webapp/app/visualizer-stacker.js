@@ -52,7 +52,6 @@ export class VisualizerStacker extends Visualizer {
         }
 
         for (let index in usage) {
-
             for (let index2 in usage[index]) {
                 usageColumns[index2].push(usage[index][index2])
             }
@@ -83,10 +82,7 @@ export class VisualizerStacker extends Visualizer {
         });
 
         let sortedWords = _.sortBy(this.wordData, [function(o) { return -o[1][0]; }]);
-
         const [words, counts] = _.unzip(sortedWords.slice(0, 30));
-        // const [countsTopic1, countsTopic2] = _.unzip(counts);
-
         let wordUsageColumns = [];
 
         for (let index in counts[0]) {
@@ -94,7 +90,6 @@ export class VisualizerStacker extends Visualizer {
         }
 
         for (let index in counts) {
-
             for (let index2 in counts[index]) {
                 wordUsageColumns[index2].push(counts[index][index2])
             }
@@ -104,9 +99,6 @@ export class VisualizerStacker extends Visualizer {
         bb.generate({
             data: {
                 columns: [
-                    //TODO: capire quali sono i topic e SE SONO TOPIC E NON SENTIMENTI. STESSA COSA OVUNQUE PER NOMI COLONNE
-                    /*['Word usage Topic 1', ...countsTopic1],
-                    ['Word usage Topic 2', ...countsTopic2]*/
                     ...wordUsageColumns
                 ],
                 type: "bar"
@@ -124,9 +116,6 @@ export class VisualizerStacker extends Visualizer {
                 x: {
                     type: "category",
                     categories: words,
-                    //TODO: it doesn't work, <rect> attributes all NaNs
-                    // extent: [words[1], words[5]]
-                    // extent: [1, 5]
                 }
             },
 
@@ -134,7 +123,6 @@ export class VisualizerStacker extends Visualizer {
         });
 
         const [linkLabels, linkValues] = _.unzip(this.linkData);
-        // const [linkValuesTopic1, linkValuesTopic2] = _.unzip(linkValues);
 
         let linkValuesColumns = [];
 
@@ -173,15 +161,12 @@ export class VisualizerStacker extends Visualizer {
             bindto: "#link-bar"
         });
 
-
-
         let retAndFavColumns =[];
         let groups = [];
         for (let index in this.retweets) {
             retAndFavColumns.push([this.names[index]]);
             groups.push(this.names[index])
         }
-
 
         for (let index in this.retweets) {
             retAndFavColumns[index].push(this.retweets[index]);
@@ -219,44 +204,5 @@ export class VisualizerStacker extends Visualizer {
             },
             bindto: "#bubbles"
         });
-
-        /*//TODO: this or super .selector?
-        const h = d3.select(super.selector).select('#bubbles').node().clientHeight;
-        const w = d3.select(super.selector).select('#bubbles').node().clientWidth;
-
-        const bubbleData = [{
-            value: this.retweets,
-            x: w / 2 - h,
-            img: serverUrl + 'retweet.svg'
-        }, {
-            value: this.likes,
-            x: w / 2 + h,
-            img: serverUrl + 'twit_heart.png'
-        }];
-
-        const startSelector = d3.select(this.selector)
-            .select('#bubbles')
-            .append('svg')
-            .attr('height', '100%')
-            .attr('width', '100%')
-            .selectAll('g')
-            .data(bubbleData)
-            .enter()
-            .append('g')
-            .attr('transform', d => `translate(${d.x}, 0)`);
-
-        startSelector.append('image')
-            .attr('width', h)
-            .attr('height', h)
-            .attr('xlink:href', d => d.img);
-
-        startSelector.append('text')
-            .attr('y', h / 2)
-            .attr('x', h / 2)
-            .attr('text-anchor', 'middle')
-            .attr('alignment-baseline', 'middle')
-            .text(b => b.value);
-            */
     }
-
 }
