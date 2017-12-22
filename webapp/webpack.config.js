@@ -45,7 +45,7 @@ module.exports = {
       'serverUrl': JSON.stringify('http://localhost:8000/')
     }),
     //new webpack.HotModuleReplacementPlugin(),
-    new OpenBrowserPlugin({ url: 'http://localhost:8080' }),
+    //new OpenBrowserPlugin({ url: 'http://localhost:8080' }),
     new webpack.LoaderOptionsPlugin({
       options: {
         sassLoader: {
