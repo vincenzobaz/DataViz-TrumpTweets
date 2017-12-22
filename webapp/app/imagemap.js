@@ -1,23 +1,33 @@
 import * as _ from 'lodash';
 
+/**
+ * Given the name of the bubble, return the Image object containing
+ * the corresponding image
+ * @param {string} name the name of the bubble
+ */
 export const textToImage = name => {
     return getImage(name);
 };
 
+// Cache object to avoid refetching the image from server
+// at each call.
 const cache = {};
 
 const getImage = name => {
-    /*
+    // If in cache, just return
     if (_.has(cache, name)){
         return cache[name];
-    } */
+    }
+    // Oterwise, create Image with appropriate url
     const img = new Image();
     img.src = serverUrl + map[name];
+    // Store in cache
     cache[name] = img;
     return img;
 };
 
 
+// bubble name -> path of image
 const map = {
     'Sadness': 'sentiments/sadness.png',
     'Disgust': 'sentiments/disgust.png',
