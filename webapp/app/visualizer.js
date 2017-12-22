@@ -2,6 +2,9 @@ import * as d3 from 'd3';
 import * as _ from 'lodash';
 import { bb } from 'billboard.js';
 
+/**
+ * Class responsible for displaying the data plots
+ */
 export class Visualizer {
     constructor(selector, animTime = 500) {
         this.selector = '#' + selector;
@@ -10,6 +13,9 @@ export class Visualizer {
         this.divExists = true;
     }
 
+    /**
+     * Creates necessary divs
+     */
     createDivs() {
         const bigBox = d3.select(this.selector)
             .append('div')
@@ -22,6 +28,9 @@ export class Visualizer {
         this.divExists = true;
     }
 
+    /**
+     * Draw all plots using billboard and add counts to bottom.
+     */
     draw() {
         if (!this.divExists) {
             this.createDivs();
@@ -68,7 +77,10 @@ export class Visualizer {
             axis: {
                 x: {
                     type: "category",
-                    categories: words
+                    categories: words,
+                    tick: {
+                        fit: true,
+                    }
                 }
             },
             zoom: {
@@ -142,6 +154,5 @@ export class Visualizer {
     hide() {
         d3.select('.stats')
           .remove();
-
     }
 }
