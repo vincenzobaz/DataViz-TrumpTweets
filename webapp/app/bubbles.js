@@ -317,7 +317,8 @@ export class Bubbles {
             ctx.strokeStyle = '#fff';
             ctx.stroke();
 
-            ctx.fillStyle = 'black';
+            ctx.fillStyle = 'blue';
+            ctx.font = 'bold 1.1em arial';
             ctx.textAlign = 'center';
             // Draw image in circle
             ctx.drawImage(textToImage(b.prettyText), b.x - b.r, b.y - b.r, b.r * 2, b.r * 2);
