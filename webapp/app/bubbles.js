@@ -236,13 +236,11 @@ export class Bubbles {
      */
     addMultipleSelectionButtons() {
         if (this.drawnButtons) { // Do not draw if already drawn
+            const b = d3.select('#selection-buttons')
+                .select('.btn-success')
+                .node();
             // Only allow comparison of two bubbles
-            if (this.selectedBubbles && this.selectedBubbles.length == 2) {
-                d3.select(this.selector)
-                    .select('#selection-buttons')
-                    .select('.btn-success')
-                    .node().disabled = false;
-            }
+            if (b) b.disabled = !(this.selectedBubbles && this.selectedBubbles.length == 2)
             return;
         }
         const div = d3.select(this.selector)
@@ -274,6 +272,7 @@ export class Bubbles {
                 this.compareMultiple([]);
                 // Restore packed layout
                 this.resetView()
+                this.removeMultipleSelectionButtons();
             }
             );
         this.drawnButtons = true;
@@ -294,9 +293,6 @@ export class Bubbles {
 
         // Clear canvas
         ctx.clearRect(0, 0, width, height);
-
-        // If no bubble is selected for multiple selection, do not show buttons
-        if (!this.selectedBubbles || !this.selectedBubbles.length) this.removeMultipleSelectionButtons();
 
         // Show drop area for bubbles if dragging
         if (this.dragging || (this.selectedBubbles && this.selectedBubbles.length)) {
