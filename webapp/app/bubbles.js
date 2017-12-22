@@ -2,9 +2,12 @@ import * as d3 from 'd3';
 import * as _ from 'lodash';
 import { textToImage } from './imagemap';
 
+/**
+ * Implementation of our bubble plot.
+ */
 export class Bubbles {
     constructor(selector, bubbles, dimensionsFull, dimensionsCollapsed, compareMultiple, animTime = 500) {
-        // Compute coordinates for bubbles
+        // Compute coordinates and sizes for bubbles
         const layout = d3.pack()
             .size(dimensionsFull)
             .padding(5);
@@ -46,11 +49,17 @@ export class Bubbles {
         this.drawnButtons = false;
     }
 
+    /**
+     * Callback executed when the user clicks on a bubble
+     */
     startDragging() {
         this.dragging = false;
         if (!d3.event.active) this.simulation.alphaTarget(0.3).restart();
     }
 
+    /**
+     * Callback executed when the user clicks on a bubble
+     */
     duringDragging() {
         this.dragging = true;
         if (this.collapsed) return;
@@ -58,6 +67,11 @@ export class Bubbles {
         d3.event.subject.fx = d3.event.x;
         d3.event.subject.fy = d3.event.y;
     }
+
+
+    /**
+     * Callback executed at the end of the drag and drop
+     */
 
     endDraggin() {
         if (!this.dragging) this.callback(d3.event.subject);
@@ -75,22 +89,28 @@ export class Bubbles {
                 b.r = this.dimensionsCollapsed[0] / 2;
                 b.x = this.dimensionsCollapsed[0] / 2
             });
-            this.draw();
+            // Add control buttons for selected bubbles
             this.addMultipleSelectionButtons();
+            // Flatten selected bubbles on the left.
             this.collapse(this.selectedBubbles);
         }
 
         this.dragging = false;
     }
 
+    /**
+     *  Disable all forces acting on provided bubble
+     */
     removeForcesFromBubble(b) {
         this.simulation.nodes(this.simulation.nodes().filter(b1 => b1.data.text != b.data.text));
     }
 
+    /**
+     * Activate simulation on bubbles: drag and drop and positional forces
+     */
     startSimulation() {
         if (this.simulationRunning) return;
         this.simulation = d3.forceSimulation(this.bubbles);
-        //this.bubbles.forEach(b => b.r = b.packedR)
         this.simulation.force('collide', d3.forceCollide(b => b.r + 5).iterations(5))
             .force('xf', d3.forceX(b => b.packedX).strength(1))
             .force('yf', d3.forceY(b => b.packedY).strength(1))
@@ -106,6 +126,9 @@ export class Bubbles {
         this.simulationRunning = true;
     }
 
+    /**
+     * Apply force to bubbles to move them to flattened position
+     */
     activateColllapseForces() {
         this.bubbles.forEach(b => {
             b.simulation = d3.forceSimulation([b])
@@ -118,6 +141,9 @@ export class Bubbles {
         });
     }
 
+    /**
+     * Remove collapse force from bubbles
+     */
     deleteColllapseForces() {
         this.bubbles.forEach(b => {
             if (!b.simulation) return;
@@ -128,41 +154,57 @@ export class Bubbles {
         });
     }
 
+    /**
+     * Stop current simulation
+     */
     stopSimulation() {
-        // Remove forces from simulation
         this.simulation.force('xf', null)
             .force('yf', null)
             .force('collide', null);
         this.simulationRunning = false;
     }
 
+    /**
+     * Restore original bubble sizes and move them back to original position.
+     */
     resetView() {
         this.collapsed = false;
-        this.selectedBubble = null;
+        // No bubble is selected
         this.selectedBubbles = [];
-        this.bubbles.forEach(b => {
-            b.r = b.packedR;
-        });//this.reset();
+        // Restore size
+        this.bubbles.forEach(b => b.r = b.packedR);
+        // Delete forces keeping bubbles flattened
         this.deleteColllapseForces();
+        // Restore positional forces on all bubbles
         this.simulation.nodes(this.bubbles);
+        // Restart simulation
         this.startSimulation();
     }
 
-    callback(layout_bubble) {
+    /**
+     * Callback executed when the user clicks on a bubble
+     * @param {bubble} clickedBubble the bubble object just clicked.
+     */
+    callback(clickedBubble) {
         // Click on already selected => reset
-        if (this.selectedBubble && layout_bubble.data.text === this.selectedBubble) {
+        if (this.selectedBubble && clickedBubble.data.text === this.selectedBubble) {
             this.resetView();
         } else { // Otherwise select new bubble and redraw
             this.collapsed = true;
-            this.selectedBubble = layout_bubble.data.text;
+            this.selectedBubble = clickedBubble.data.text;
             this.stopSimulation();
             this.collapse(this.bubbles, [this.selectedBubble]);
             this.activateColllapseForces();
         }
         // Execute bubble callback if one was provided
-        if (_.has(layout_bubble.data, 'callback')) layout_bubble.data.callback();
+        if (_.has(clickedBubble.data, 'callback')) clickedBubble.data.callback();
     }
 
+    /**
+     * Computes flattened positions and sizes for the provided list of bubbles.
+     * @param {bubble[]} bubbles bubbles whose size and position are to be computed
+     * @param {string[]} selected names of the selected bubbles (multiple bubbles comparison)
+     */
     collapse(bubbles, selected = null) {
         const specialSize = this.dimensionsCollapsed[0];
         const normalSize = (this.dimensionsCollapsed[1] - this.dimensionsCollapsed[0]) / (bubbles.length - 1);
@@ -189,8 +231,12 @@ export class Bubbles {
         });
     }
 
+    /**
+     * Creates the Compare and Reset buttons for bubble comparison
+     */
     addMultipleSelectionButtons() {
-        if (this.drawnButtons) {
+        if (this.drawnButtons) { // Do not draw if already drawn
+            // Only allow comparison of two bubbles
             if (this.selectedBubbles && this.selectedBubbles.length == 2) {
                 d3.select(this.selector)
                     .select('#selection-buttons')
@@ -210,9 +256,11 @@ export class Bubbles {
             .attr('disabled', true)
             .on('click', () => {
                 const selectedNames = this.selectedBubbles.map(b => b.data.text);
+                // When comparing, only draw the bubbles being compared
                 this.notDrawing = new Set(this.bubbles.filter(b => !selectedNames.includes(b.data.text)).map(b => b.data.text));
                 this.collapsed = true;
                 this.stopSimulation();
+                // Trigger StackedVisualizer
                 this.compareMultiple(selectedNames);
             });
 
@@ -221,15 +269,19 @@ export class Bubbles {
             .attr('class', 'btn btn-danger btn-block')
             .html('Reset')
             .on('click', () => {
-                this.selectedBubbles = null;
+                // No bubbles is selected anymore
                 this.notDrawing = null;
                 this.compareMultiple([]);
+                // Restore packed layout
                 this.resetView()
             }
             );
         this.drawnButtons = true;
     }
 
+    /**
+     * Deletes multiple selection buttons
+     */
     removeMultipleSelectionButtons() {
         d3.select(this.selector).select('#selection-buttons').remove();
         this.drawnButtons = false;
@@ -237,12 +289,16 @@ export class Bubbles {
 
     draw() {
         const [width, height] = this.dimensionsFull;
+        // Shorter reference to canvas
         const ctx = this.context;
 
+        // Clear canvas
         ctx.clearRect(0, 0, width, height);
 
+        // If no bubble is selected for multiple selection, do not show buttons
         if (!this.selectedBubbles || !this.selectedBubbles.length) this.removeMultipleSelectionButtons();
 
+        // Show drop area for bubbles if dragging
         if (this.dragging || (this.selectedBubbles && this.selectedBubbles.length)) {
             ctx.beginPath();
             ctx.fillStyle = 'black';
@@ -253,21 +309,25 @@ export class Bubbles {
             ctx.closePath();
         }
 
-
+        // Draw all bubbles
         this.bubbles.forEach(b => {
+            // Do not draw bubbles not supposed to be visible
             if (this.notDrawing && this.notDrawing.has(b.data.text)) return;
+
+            // Draw circle
             ctx.beginPath();
             ctx.moveTo(b.x + b.r, b.y);
             ctx.arc(b.x, b.y, b.r, 0, 2 * Math.PI);
-            //ctx.fill();
             ctx.strokeStyle = '#fff';
             ctx.stroke();
 
             ctx.fillStyle = 'black';
             ctx.textAlign = 'center';
-            // ctx.drawImage(textToImage(b.prettyText), b.x - b.r, b.y - b.r, b.r * 2, b.r * 2);
+            // Draw image in circle
             ctx.drawImage(textToImage(b.prettyText), b.x - b.r, b.y - b.r, b.r * 2, b.r * 2);
+            // Add text
             ctx.fillText(b.prettyText, b.x, b.y);
+            // Image should be drawn over circle
             ctx.globalCompositeOperation = 'source-over';
             ctx.closePath();
         });
