@@ -1,19 +1,14 @@
 import * as _ from 'lodash';
 
-/**
- * Auxiliary functions to prepare the data for displaying.
- */
-
-// Stopwords to remove from wordcount
-const stopwords = ['.', ',', '?', '!', '\'', '"', ':', ';', '...', '-', '@',
-    'the', 'to', 'is', 'a', 'and', 'in', 'you', 'of', 'i', 'for', 'at', 'on',
-    'be', 'amp', 'your', 'my', 'it', 'will', 'our', 'us', 'we', 'cont', 'are',
-    'from', 'has', 'that', 'this', 'she', 'her', 'have', 'with', 'he',
-    'new', 'just', 'from', 'now', 'as', 'he', 'its', 'by', 'they', 'was',
-    'not', 'so', 'more', 'about', 'what', 'all', 'get', 'but', 'one',
-    'over', 'their', 'why', 'when', 'what', 'them', 'who', 'said', 'out',
-    'would', 'had', 'can', 'should', 'would', 'do', 'been', 'an', 'cont', 'dont',
-    '1','2','3','4','5','6','7','8','9', 'http', 'https', 'how', 'ing', 'gre', 'dont', 'cont'];
+const stopwords = ["the", "to", "is", "a", "and", "in", "you", "of", "i", "for", "at", "on",
+    "be", "amp", "your", "my", "it", "will", "our", "us", "we", "cont", "are",
+    "from", "has", "that", "this", "she", "her", "have", "with", "he",
+    "new", "just", "from", "now", "as", "he", "its", "by", "they", "was",
+    "not", "so", "more", "about", "what", "all", "get", "but", "one",
+    "over", "their", "why", "when", "what", "them", "who", "said", "out",
+    "would", "had", "can", "should", "would", "do", "been", "an", "cont", "dont",
+    "1","2","3","4","5","6","7","8","9", "http", "https", "how", "ing", "gre", "ald", "nks",
+    "you", "much"];
 
 /**
  * Clean text from stopwords and punctuation
